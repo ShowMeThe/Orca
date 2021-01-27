@@ -23,6 +23,7 @@ dependencies {
     compileOnly(gradleApi())
     compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
     compileOnly("com.android.tools.build:gradle:4.0.1")
+    implementation("com.squareup:javapoet:1.13.0")
 }
 
 gradlePlugin {
