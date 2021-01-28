@@ -1,4 +1,4 @@
-package com.orcinus.orca
+package com.occ.orca
 
 import java.io.UnsupportedEncodingException
 import java.security.InvalidAlgorithmParameterException

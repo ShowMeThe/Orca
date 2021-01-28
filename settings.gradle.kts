@@ -1,3 +1,4 @@
+include(":core")
 include(":testLib")
 includeBuild("plugin")
 include(":app")

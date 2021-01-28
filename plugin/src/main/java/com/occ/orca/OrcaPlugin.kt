@@ -1,4 +1,4 @@
-package com.orcinus.orca
+package com.occ.orca
 
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin

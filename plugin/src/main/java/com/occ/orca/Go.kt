@@ -1,4 +1,4 @@
-package com.orcinus.orca
+package com.occ.orca
 
 import groovy.lang.Closure
 import org.gradle.api.Action

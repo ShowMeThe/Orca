@@ -30,7 +30,7 @@ gradlePlugin {
     plugins {
         create("Orca.So") {
             id = "Orca.So"
-            implementationClass = "com.orcinus.orca.OrcaPlugin"
+            implementationClass = "com.occ.orca.OrcaPlugin"
         }
     }
 }

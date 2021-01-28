@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'Orca.So'
 }
 
 android {
@@ -18,13 +17,6 @@ android {
         consumerProguardFiles "consumer-rules.pro"
     }
 
-    Orca.go{
-        encrypt{
-            "data2"{
-                value = "12312"
-            }
-        }
-    }
 
     buildTypes {
         release {
