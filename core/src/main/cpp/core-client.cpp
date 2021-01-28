@@ -5,7 +5,7 @@
 // Created by Ken on 2021/1/28.
 //
 
-
+#include "include/core-client.h"
 
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
