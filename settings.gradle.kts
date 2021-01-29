@@ -1,5 +1,4 @@
-include(":core")
-include(":testLib")
+include(":orca-core")
 includeBuild("plugin")
 include(":app")
 rootProject.name = "orca"

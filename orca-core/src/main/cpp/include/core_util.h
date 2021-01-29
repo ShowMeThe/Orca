@@ -7,13 +7,9 @@
 
 #include <string>
 #include <sstream>
+#include <android/log.h>
 
+#define LOG(...)__android_log_print(ANDROID_LOG_INFO, "Occ-core", __VA_ARGS__)
 
-template<typename T>
-std::string to_string(const T &n) {
-    std::ostringstream stream;
-    stream << n;
-    return stream.str();
-}
 
 #endif //ORCA_CORE_UTIL_H

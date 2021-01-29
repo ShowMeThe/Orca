@@ -10,14 +10,16 @@ class Go(val project: Project) {
 
     val keys: NamedDomainObjectContainer<KeyExt> by lazy { project.container(KeyExt::class.java) }
 
+    var signature = ""
+
 
     fun encrypt(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
-        print("encrypt start closure")
+        println("encrypt start closure")
         keys.configure(closure)
     }
 
     fun encrypt(action: Action<NamedDomainObjectContainer<KeyExt>>) {
-        print("encrypt start action")
+        println("encrypt start action")
         action.execute(keys)
     }
 
