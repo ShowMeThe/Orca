@@ -12,6 +12,7 @@ class Go(val project: Project) {
 
     var signature = ""
 
+    var secretKey = ""
 
     fun encrypt(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
         println("encrypt start closure")

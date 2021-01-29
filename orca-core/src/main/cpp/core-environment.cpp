@@ -5,7 +5,7 @@
 #include <string>
 #include "include/core-client.h"
 #include "include/core_util.h"
-#include "include/core-enviroment.h"
+#include "include/core-environment.h"
 
 using namespace std;
 

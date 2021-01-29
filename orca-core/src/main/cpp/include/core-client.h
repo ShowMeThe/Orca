@@ -15,6 +15,8 @@
 
 #define SIGNATURE ""
 
-#define SECRET_KEY "DEFAULT"
+#define HEADER ""
+
+#define SECRET_KEY ""
 
 #endif //ORCA_CORE_CLIENT_H

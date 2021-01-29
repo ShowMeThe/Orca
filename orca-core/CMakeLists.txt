@@ -7,7 +7,8 @@ add_library(
         SHARED
 
         src/main/cpp/core-client.cpp
-        src/main/cpp/core-enviroment.cpp
+        src/main/cpp/core-environment.cpp
+        src/main/cpp/core-encryption.cpp
 )
 
 include_directories(src/main/cpp/include)

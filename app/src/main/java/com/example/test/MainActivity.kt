@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
-import com.orcc.core.CoreClient
+import com.orcc.app.core.CoreClient
 
 
 class MainActivity : AppCompatActivity() {
@@ -16,9 +16,9 @@ class MainActivity : AppCompatActivity() {
 
 
         findViewById<TextView>(R.id.tv).apply {
-           text =  CoreClient.getString()
+           text =  CoreClient.getData()
         }
 
-        Log.e("222222","${SignatureUtils.getSignature(this)}")
+
     }
 }

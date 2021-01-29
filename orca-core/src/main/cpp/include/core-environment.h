@@ -1,9 +1,9 @@
 //
-// Created by Ken on 2021/1/29.
+// Created by ken on 2021/1/29.
 //
 
-#ifndef ORCA_CORE_ENVIROMENT_H
-#define ORCA_CORE_ENVIROMENT_H
+#ifndef ORCA_CORE_ENVIRONMENT_H
+#define ORCA_CORE_ENVIRONMENT_H
 
 #include <jni.h>
 #include "core-client.h"
@@ -35,4 +35,4 @@ public:
 
 
 
-#endif //ORCA_CORE_ENVIROMENT_H
+#endif //ORCA_CORE_ENVIRONMENT_H

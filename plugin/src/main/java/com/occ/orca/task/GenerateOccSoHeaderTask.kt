@@ -1,6 +1,10 @@
 package com.occ.orca.task
 
+import com.occ.orca.AESEncryption
+import com.occ.orca.KeyExt
+import com.occ.orca.StringUtils
 import org.gradle.api.DefaultTask
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -13,6 +17,15 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
     @Input
     var signature = ""
+
+    @Input
+    var header = ""
+
+    @Input
+    var secretKey = "FTat46cvyia6758@243lid66wxzvwe23dgfhcfg76wsd@5as431aq1256dsaa211"
+
+    @Input
+    lateinit var keys: NamedDomainObjectContainer<KeyExt>
 
     @TaskAction
     fun generate() {
@@ -31,6 +44,14 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
         lines.add("#define SIGNATURE \"$signature\"\n")
 
+        lines.add("#define HEADER \"$header\"\n")
+
+        lines.add("#define SECRET_KEY \"$secretKey\"\n")
+
+        lines.add("#define LOAD_MAP(_map) \\\n")
+        keys.forEach {
+            lines.add("    _map[\"${StringUtils.md5(it.name)}\"] = \"${AESEncryption.encrypt(secretKey, it.value)}\"; \\\n")
+        }
 
         lines.add("\n#endif //ORCA_CORE_CLIENT_H")
         val writer = file.bufferedWriter()

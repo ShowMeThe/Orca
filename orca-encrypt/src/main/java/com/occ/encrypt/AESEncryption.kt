@@ -1,11 +1,12 @@
-package com.occ.orca
+package com.occ.encrypt
 
+import android.util.Base64
 import java.io.UnsupportedEncodingException
+import java.nio.charset.Charset
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.util.*
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.IllegalBlockSizeException
@@ -13,9 +14,7 @@ import javax.crypto.NoSuchPaddingException
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-
 class AESEncryption private constructor() {
-
     companion object {
         private const val CHARSET = "UTF-8"
         private const val HASH_ALGORITHM = "MD5"
@@ -40,6 +39,8 @@ class AESEncryption private constructor() {
         )
 
 
+
+        @JvmStatic
         fun encrypt(key: String, message: String): String {
             var result: ByteArray? = null
             try {
@@ -50,16 +51,17 @@ class AESEncryption private constructor() {
             }
             return if (result == null) {
                 ""
-            } else Base64.getEncoder().encodeToString(result)
+            } else Base64.encodeToString(result, Base64.DEFAULT)
         }
 
+        @JvmStatic
         fun decrypt(key: String, cipherMessage: String?): String {
             var result = ""
             try {
                 val keySpec = generateKeySpec(key)
-                val cipherBytes = Base64.getDecoder().decode(cipherMessage)
-                result = String(decrypt(keySpec, iv, cipherBytes), charset(CHARSET))
-            } catch (e: Exception) {
+                val cipherBytes = Base64.decode(cipherMessage, Base64.DEFAULT)
+                result = String(decrypt(keySpec, iv, cipherBytes), Charset.forName(CHARSET))
+            }  catch (e: Exception) {
                 e.printStackTrace()
             }
             return result
@@ -96,11 +98,7 @@ class AESEncryption private constructor() {
             BadPaddingException::class,
             IllegalBlockSizeException::class
         )
-        private fun decrypt(
-            keySpec: SecretKeySpec,
-            iv: ByteArray,
-            cipherMessage: ByteArray
-        ): ByteArray {
+        private fun decrypt(keySpec: SecretKeySpec, iv: ByteArray, cipherMessage: ByteArray): ByteArray {
             val cipher = Cipher.getInstance(AES_MODE)
             val ivParameterSpec = IvParameterSpec(iv)
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivParameterSpec)

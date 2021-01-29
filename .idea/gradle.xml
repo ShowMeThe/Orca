@@ -24,7 +24,9 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/orca-core" />
+            <option value="$PROJECT_DIR$/orca-encrypt" />
             <option value="$PROJECT_DIR$/plugin" />
+            <option value="$PROJECT_DIR$/testLib" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

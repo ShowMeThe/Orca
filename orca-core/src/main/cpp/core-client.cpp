@@ -7,12 +7,32 @@
 //
 #include "include/core_util.h"
 #include "include/core-client.h"
-#include "include/core-enviroment.h"
+#include "include/core-environment.h"
+#include "include/core-encryption.h"
 #include <string>
 
 using namespace std;
 
 environment *environments;
+
+map<string, string> _map;
+
+
+extern "C"
+JNIEXPORT jstring JNICALL getString(JNIEnv *env,jclass clazz,jstring key_){
+    const char *key = env->GetStringUTFChars(key_, nullptr);
+    string keyStr(key);
+    string value = _map[keyStr];
+    auto *encryption = new class encryption(env, environments->getContext());
+    const char *result = encryption->decrypt(SECRET_KEY, value.c_str());
+    env->ReleaseStringUTFChars(key_, key);
+    return env->NewStringUTF(result);
+}
+
+JNINativeMethod methods[] = {
+        { "getString", "(Ljava/lang/String;)Ljava/lang/String;",(void*)getString},
+};
+
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
@@ -20,13 +40,22 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
     environments = new environment(env,nullptr);
-    if (!environments->checkSignature()) {
-        return JNI_ERR;
-    }
+//    if (!environments->checkSignature()) {
+//        return JNI_ERR;
+//    }
+
+    string clazzName("com/orcc/");
+    clazzName.append(HEADER);
+    clazzName.append("/core/CoreClient");
+    jclass clazz = env->FindClass(clazzName.data());
+
+    env->RegisterNatives(clazz, methods, sizeof(methods)/sizeof(JNINativeMethod));
+
+    LOAD_MAP(_map);
     return JNI_VERSION_1_6;
 }
 
-extern "C" jstring
-Java_com_orcc_core_CoreClient_getString(JNIEnv *env, jobject thiz) {
-    return env->NewStringUTF(SIGNATURE);
-}
+
+
+
+
