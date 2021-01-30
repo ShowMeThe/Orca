@@ -5,10 +5,13 @@ import com.android.build.gradle.api.BaseVariant
 import com.occ.orca.task.GenerateCMakeLists
 import com.occ.orca.task.GenerateJavaClientFileTask
 import com.occ.orca.task.GenerateOccSoHeaderTask
+import groovy.lang.Closure
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.FileTree
 import org.gradle.kotlin.dsl.project
 import java.io.File
+import java.util.*
 
 class OrcaPlugin : Plugin<Project> {
 
@@ -37,28 +40,28 @@ class OrcaPlugin : Plugin<Project> {
     }
 
     private fun attach2Lib(android: LibraryExtension, target: Project) {
-        val nativeOriginPath = copyNativePath(target)
+        val nativeOriginPath = getNativeFile(target)
         copyNativeCode(nativeOriginPath, android, target)
         target.dependencies.apply {
-            add("implementation",project(":orca-encrypt"))
+            add("implementation", project(":orca-encrypt"))
         }
         target.afterEvaluate {
             android.libraryVariants.all {
-                buildTask(this,target)
+                buildTask(this, target)
             }
         }
     }
 
 
     private fun attach2App(android: AppExtension, target: Project) {
-        val nativeOriginPath = copyNativePath(target)
+        val nativeOriginPath = getNativeFile(target)
         copyNativeCode(nativeOriginPath, android, target)
         target.dependencies.apply {
-            add("implementation",project(":orca-encrypt"))
+            add("implementation", project(":orca-encrypt"))
         }
         target.afterEvaluate {
             android.applicationVariants.all {
-                buildTask(this,target)
+                buildTask(this, target)
             }
         }
     }
@@ -67,9 +70,13 @@ class OrcaPlugin : Plugin<Project> {
     /**
      * copy Native code
      */
-    private fun copyNativeCode(nativeOriginPath: String?, android: TestedExtension, project: Project) {
+    private fun copyNativeCode(
+        nativeOriginPath: Any?,
+        android: TestedExtension,
+        project: Project
+    ) {
         val file = File(project.buildDir, "orca.so")
-        if(!file.exists()){
+        if (!file.exists()) {
             project.copy {
                 from(nativeOriginPath)
                 include("src/main/cpp/**")
@@ -105,15 +112,15 @@ class OrcaPlugin : Plugin<Project> {
     private fun buildTask(variant: BaseVariant, project: Project) {
         val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
         val go = (project.extensions.findByName("Orca") as Orca).go
-        if(localSignature.isEmpty()){
-            localSignature =  go.signature
+        if (localSignature.isEmpty()) {
+            localSignature = go.signature
         }
 
         val task = project.tasks.create(
             "generate${StringUtils.substring(variant.name)}SoHeader",
             GenerateOccSoHeaderTask::class.java
         )
-        if(go.secretKey.isNotEmpty()){
+        if (go.secretKey.isNotEmpty()) {
             task.secretKey = go.secretKey
         }
         task.keys = go.keys
@@ -143,15 +150,30 @@ class OrcaPlugin : Plugin<Project> {
     /**
      * find C++ root
      */
-    private fun getNativeRelatePath(project: Project) =
-        project.rootProject.subprojects.find { it.name == "orca-core" }
-
-    /**
-     * Copy C++ code
-     */
-    private fun copyNativePath(project: Project): String? {
-        val findProject = getNativeRelatePath(project)
-        return findProject?.buildDir?.canonicalPath?.substringBeforeLast("\\build")
+    private fun getNativeFile(project: Project): Any? {
+        if (project.rootProject.subprojects.find { it.name == "orca-core" } != null) {
+            return project.rootProject.file("orca-core").canonicalPath
+        } else {
+            var fileProject = findNativeFromBuildScript(project)
+            if (fileProject == null) {
+                fileProject = findNativeFromBuildScript(project.rootProject)
+            }
+            return fileProject
+        }
     }
+
+    private fun findNativeFromBuildScript(project: Project): Any? {
+        var result: Any? = null
+        project.buildscript.configurations.forEach { config ->
+            val file = config.files.find {
+                it.name.toUpperCase(Locale.getDefault()).contains("ORCA.SO")
+            }
+            if(file!=null){
+                result = project.zipTree(file)
+            }
+        }
+        return result
+    }
+
 
 }
