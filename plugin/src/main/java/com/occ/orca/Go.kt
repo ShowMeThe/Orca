@@ -14,12 +14,12 @@ class Go(val project: Project) {
 
     var secretKey = ""
 
-    fun encrypt(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
+    fun storeSet(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
         println("encrypt start closure")
         keys.configure(closure)
     }
 
-    fun encrypt(action: Action<NamedDomainObjectContainer<KeyExt>>) {
+    fun storeSet(action: Action<NamedDomainObjectContainer<KeyExt>>) {
         println("encrypt start action")
         action.execute(keys)
     }

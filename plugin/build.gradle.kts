@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.cfg.pseudocode.or
 import org.jetbrains.kotlin.konan.properties.Properties
 
 buildscript {
@@ -20,6 +21,7 @@ plugins {
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
+val pVersion = "2.0.0-alpha"
 
 plugins.apply("com.novoda.bintray-release")
 configure<com.novoda.gradle.release.PublishExtension> {
@@ -27,7 +29,7 @@ configure<com.novoda.gradle.release.PublishExtension> {
     repoName = "Orca"
     groupId = "com.occ.orca"
     artifactId = "orca.so"
-    publishVersion = "1.0.0"
+    publishVersion = pVersion
     desc = ""
     website = "https://github.com/ShowMeThe/Orca"
     bintrayUser = properties.getProperty("username")
@@ -38,11 +40,10 @@ configure<com.novoda.gradle.release.PublishExtension> {
 
 val parentDir = project.rootDir.path
 val orca_core = file(parentDir + File.separator + "orca-core")
-val orca_encrypt = file(parentDir + File.separator + "orca_encrypt")
 val archivesBaseName = "orca.so"
 task("zipNative",Zip::class){
     destinationDir = project.file("build/libs")
-    archiveName  = "$archivesBaseName-1.0.0.jar"
+    archiveName  = "$archivesBaseName-${pVersion}.jarx"
     from(project.zipTree("build/libs/plugin.jar"))
     include("META-INF/**")
     include("com/**")
@@ -50,9 +51,13 @@ task("zipNative",Zip::class){
     include("src/main/**")
     exclude("CMakeLists.txt")
     exclude("src/main/AndroidManifest.xml")
-    from(orca_encrypt.canonicalPath)
-    include("src/main/**")
-    exclude("src/main/AndroidManifest.xml")
+
+    doLast {
+        val originJar = project.file("build/libs/plugin.jar")
+        val xJar = project.file("build/libs/$archivesBaseName-${pVersion}.jarx")
+        originJar.delete()
+        xJar.renameTo(originJar)
+    }
 }
 
 tasks.getByName("jar").finalizedBy("zipNative")

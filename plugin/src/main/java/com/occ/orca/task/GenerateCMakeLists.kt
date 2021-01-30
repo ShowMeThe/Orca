@@ -10,7 +10,7 @@ class GenerateCMakeLists(val project: Project) {
            field = value + "-core-client"
        }
 
-    fun build(){
+    fun build(call:()->Unit){
         val cmakeListsDir = File(project.buildDir, "orca.so")
         val cmakeFileWriter = File(cmakeListsDir, "CMakeLists.txt").bufferedWriter()
 
@@ -40,6 +40,7 @@ class GenerateCMakeLists(val project: Project) {
         }
         cmakeFileWriter.flush()
         cmakeFileWriter.close()
+        call.invoke()
     }
 
 }
