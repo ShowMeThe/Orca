@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
 buildscript {
     repositories {
         jcenter()
@@ -8,10 +10,28 @@ buildscript {
     }
 }
 
+
 plugins {
     id("org.gradle.kotlin.kotlin-dsl") version "1.4.0"
     `java-gradle-plugin`
+    id("maven-publish")
+
 }
+
+val artificatId = "Orca.So"
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("OrcaPlugin"){
+                group = "com.occ.orca"
+                artifactId = artificatId
+                version = "1.0.0"
+                uri("$rootDir/repo/")
+            }
+        }
+    }
+}
+
 
 repositories {
     mavenCentral()
@@ -34,3 +54,6 @@ gradlePlugin {
         }
     }
 }
+
+
+

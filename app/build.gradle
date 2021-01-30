@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'Orca.So'
 }
 
 android {
@@ -20,14 +19,14 @@ android {
 
 
 
-    Orca.go{
-        encrypt{
-            "data"{
-                value = "4444444444"
-            }
-        }
-        signature = "-1855011418"
-    }
+//    Orca.go{
+//        encrypt{
+//            "data"{
+//                value = "4444444444"
+//            }
+//        }
+//        signature = "-1855011418"
+//    }
 
 
     buildTypes {
