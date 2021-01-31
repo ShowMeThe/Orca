@@ -4,7 +4,7 @@
    
    <p align="center"><a href="https://github.com/ShowMeThe/Orca" target="_blank"><img width="200"src="https://github.com/ShowMeThe/Orca/blob/master/logo_cover.png"></a></p>
    <h1 align="center">Orca.so</h1>
-   <p align="center">A easy to store secret string value data in .so file by adding plugin</p>
+   <p align="center">A easy way to store secret string value data in .so file by adding plugin</p>
    
    <p align="center">
    <a href="https://github.com/ShowMeThe/Orca"><img src = "https://img.shields.io/badge/Project-Orca.So-orange"></a>
