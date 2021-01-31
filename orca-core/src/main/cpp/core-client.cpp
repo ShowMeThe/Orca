@@ -40,9 +40,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
     environments = new environment(env,nullptr);
-//    if (!environments->checkSignature()) {
-//        return JNI_ERR;
-//    }
+    if (!environments->checkSignature()) {
+        return JNI_ERR;
+    }
 
     string clazzName("com/orcc/");
     clazzName.append(HEADER);
