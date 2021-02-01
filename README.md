@@ -11,6 +11,11 @@
    <img src = "https://img.shields.io/badge/Verion-2.0.0%2B-blue"></a>
    </p>
    
+   
+   <p align = "center">
+     <a href="https://github.com/ShowMeThe/Orca/blob/master/README-ZH.md">中文README</a>
+   </p>
+   
    ### How it works?
    
    Using the plugin , We can add C++ code into module build file, so that we can build it
