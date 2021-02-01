@@ -22,7 +22,7 @@
   ```gradle
   
   dependencies {
-        classpath "com.occ.orca:orca.so:2.0.0-release"
+        classpath "com.occ.orca:orca.so:2.0.0-release04"
     }
   
   ```

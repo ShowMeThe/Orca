@@ -1,3 +1,4 @@
+include(":test")
 include(":orca-core")
 include(":plugin")
 include(":app")

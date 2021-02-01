@@ -17,7 +17,7 @@ buildscript {
         classpath("com.android.tools.build:gradle:4.1.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${rootProject.extra["kotlin_version"]}")
         classpath("org.jetbrains.kotlin:kotlin-android-extensions:${rootProject.extra["kotlin_version"]}")
-
+        classpath("com.occ.orca:orca.so:2.0.0-release03")
     }
 
 }

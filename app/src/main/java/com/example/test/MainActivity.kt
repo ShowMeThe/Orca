@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import com.orcc.app.core.CoreClient
+import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -14,11 +15,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-        findViewById<TextView>(R.id.tv).apply {
-           text =  CoreClient.getData()
-        }
-
+        Log.e("MainActivity","${CoreClient.getData()}")
+        Log.e("MainActivity","${com.orcc.test.core.CoreClient.getData()}")
 
     }
 }

@@ -11,6 +11,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.Copy
 import org.gradle.kotlin.dsl.project
+import sun.rmi.runtime.Log
 import java.io.File
 import java.util.*
 
@@ -42,7 +43,7 @@ class OrcaPlugin : Plugin<Project> {
         copyNativeCode(nativeOriginPath, android, target)
         target.afterEvaluate {
             android.libraryVariants.all {
-                buildTask(this, target)
+                buildTask(nativeOriginPath,this, target)
             }
         }
     }
@@ -53,7 +54,7 @@ class OrcaPlugin : Plugin<Project> {
         copyNativeCode(nativeOriginPath, android, target)
         target.afterEvaluate {
             android.applicationVariants.all {
-                buildTask(this, target)
+                buildTask(nativeOriginPath,this, target)
             }
         }
     }
@@ -73,38 +74,49 @@ class OrcaPlugin : Plugin<Project> {
             file.mkdirs()
             project.copy {
                 from(nativeOriginPath)
-                include("src/main/**")
+                include("src/main/cpp/**")
                 into(file)
             }
         }
 
         GenerateCMakeLists(project).apply {
             lib_name = project.name
-            build {
-                android.defaultConfig {
-                    externalNativeBuild {
-                        cmake {
-                            cppFlags("")
-                        }
-                    }
+            val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
+            val cmakeListsPath = cmakeListsDir + File.separator + "CMakeLists.txt"
+            if(!File(cmakeListsPath).exists()){
+                build {
+                    setUpCmake(cmakeListsPath, android)
                 }
-                val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
-                val cmakeListsPath = cmakeListsDir + File.separator + "CMakeLists.txt"
-                android.externalNativeBuild {
-                    cmake {
-                        path = File(cmakeListsPath)
-                    }
-                }
+            }else{
+                setUpCmake(cmakeListsPath, android)
             }
         }
 
+    }
+
+    /**
+     * setUp cmake
+     */
+    private fun setUpCmake(cmakeListsPath:String,android: TestedExtension){
+        android.defaultConfig {
+            externalNativeBuild {
+                cmake {
+                    cppFlags("")
+                }
+            }
+        }
+        android.externalNativeBuild {
+            cmake {
+                path = File(cmakeListsPath)
+            }
+        }
     }
 
 
     /**
      * build task
      */
-    private fun buildTask(variant: BaseVariant, project: Project) {
+    private fun buildTask(nativeOriginPath:Any?,variant: BaseVariant, project: Project) {
         val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
         val go = (project.extensions.findByName("Orca") as Orca).go
         if (localSignature.isEmpty()) {
@@ -139,21 +151,12 @@ class OrcaPlugin : Plugin<Project> {
         generateJavaClientTask.soHeadName = project.name
         generateJavaClientTask.outputDir = outputDir
         variant.registerJavaGeneratingTask(generateJavaClientTask, outputDir)
-
-        val nativeOriginPath = getNativeFile(project)
-        val copyAESEncryptionTask = project.tasks.create("copyJavaCode${StringUtils.substring(variant.name)}",Copy::class.java){
-            from(nativeOriginPath)
-            include("src/main/java/**")
-            into(outputDir)
-        }
-        generateJavaClientTask.dependsOn(copyAESEncryptionTask)
     }
     /**
      * find C++ root
      */
     private fun getNativeFile(project: Project): Any? {
         return if (project.rootProject.subprojects.find { it.name == "orca-core" } != null) {
-            println("getNativeFile from orca-core")
             project.rootProject.file("orca-core").canonicalPath
         } else {
             var fileProject = findNativeFromBuildScript(project)
@@ -174,7 +177,6 @@ class OrcaPlugin : Plugin<Project> {
                 result = project.zipTree(file)
             }
         }
-        println("findNativeFromBuildScript = $result")
         return result
     }
 
