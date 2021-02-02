@@ -4,9 +4,15 @@ import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.reflect.TypeOf
 
 class Go(val project: Project) {
 
+    init {
+        val type = project.container(KeyExt::class.java)
+        val containerType = object : TypeOf<NamedDomainObjectContainer<KeyExt>>() {}
+        project.extensions.add(containerType,"KeyExt",type)
+    }
 
     val keys: NamedDomainObjectContainer<KeyExt> by lazy { project.container(KeyExt::class.java) }
 
@@ -23,6 +29,7 @@ class Go(val project: Project) {
         println("encrypt start action")
         action.execute(keys)
     }
+
 
 
     fun printAll(){

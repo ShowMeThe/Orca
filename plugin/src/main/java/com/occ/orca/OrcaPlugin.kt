@@ -1,17 +1,14 @@
 package com.occ.orca
 
-import com.android.build.gradle.*
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.api.BaseVariant
 import com.occ.orca.task.GenerateCMakeLists
 import com.occ.orca.task.GenerateJavaClientFileTask
 import com.occ.orca.task.GenerateOccSoHeaderTask
-import groovy.lang.Closure
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.FileTree
-import org.gradle.api.tasks.Copy
-import org.gradle.kotlin.dsl.project
-import sun.rmi.runtime.Log
 import java.io.File
 import java.util.*
 
