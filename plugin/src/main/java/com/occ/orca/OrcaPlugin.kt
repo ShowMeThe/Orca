@@ -9,6 +9,7 @@ import com.occ.orca.task.GenerateJavaClientFileTask
 import com.occ.orca.task.GenerateOccSoHeaderTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
 import java.io.File
 import java.util.*
 
@@ -148,6 +149,16 @@ class OrcaPlugin : Plugin<Project> {
         generateJavaClientTask.soHeadName = project.name
         generateJavaClientTask.outputDir = outputDir
         variant.registerJavaGeneratingTask(generateJavaClientTask, outputDir)
+
+        val copyAESEncryptionTask = project.tasks.create("copyJavaCode${StringUtils.substring(variant.name)}",
+            Copy::class.java){
+            from(nativeOriginPath)
+            include("src/main/java/**")
+            into(outputDir)
+        }
+        generateJavaClientTask.dependsOn(copyAESEncryptionTask)
+
+
     }
     /**
      * find C++ root

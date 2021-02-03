@@ -21,7 +21,7 @@ plugins {
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
-val pVersion = "2.0.0-release06"
+val pVersion = "2.0.0-release08"
 
 plugins.apply("com.novoda.bintray-release")
 configure<com.novoda.gradle.release.PublishExtension> {
