@@ -34,7 +34,7 @@ val archivesBaseName = "Orca"
 task("zipNative",Zip::class){
     destinationDir = project.file("build/libs")
     archiveName  = "$archivesBaseName-${pVersion}.jarx"
-    from(project.zipTree("build/libs/$archivesBaseName-${pVersion}.jar"))
+    from(project.zipTree(getAnyJarPath(project)))
     include("META-INF/**")
     include("com/**")
     from(orca_core.canonicalPath)
@@ -43,11 +43,22 @@ task("zipNative",Zip::class){
     exclude("src/main/AndroidManifest.xml")
 
     doLast {
-        val originJar = project.file("build/libs/$archivesBaseName-${pVersion}.jar")
+        val originJar = project.file(getAnyJarPath(project))
         val xJar = project.file("build/libs/$archivesBaseName-${pVersion}.jarx")
         originJar.delete()
         xJar.renameTo(originJar)
     }
+}
+
+fun getAnyJarPath(project: Project):Any{
+    val rootDir = "build/libs/"
+    val files =  project.file(rootDir).listFiles()
+    for(file in files){
+        if(file.path.endsWith("jar")){
+            return file.path
+        }
+    }
+    return ""
 }
 
 tasks.getByName("jar").finalizedBy("zipNative")
