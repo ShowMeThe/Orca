@@ -30,7 +30,7 @@ val pVersion = "2.0.0-release08"
 
 val parentDir = project.rootDir.path
 val orca_core = file(parentDir + File.separator + "orca-core")
-val archivesBaseName = "orca.so"
+val archivesBaseName = "Orca"
 task("zipNative",Zip::class){
     destinationDir = project.file("build/libs")
     archiveName  = "$archivesBaseName-${pVersion}.jarx"
@@ -43,7 +43,7 @@ task("zipNative",Zip::class){
     exclude("src/main/AndroidManifest.xml")
 
     doLast {
-        val originJar = project.file("build/libs/plugin.jar")
+        val originJar = project.file("build/libs/$archivesBaseName-${pVersion}.jar")
         val xJar = project.file("build/libs/$archivesBaseName-${pVersion}.jarx")
         originJar.delete()
         xJar.renameTo(originJar)
