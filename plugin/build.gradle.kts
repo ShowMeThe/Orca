@@ -23,20 +23,6 @@ val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
 val pVersion = "2.0.0-release08"
 
-plugins.apply("com.novoda.bintray-release")
-configure<com.novoda.gradle.release.PublishExtension> {
-    userOrg = "yejiaken"
-    repoName = "Orca"
-    groupId = "com.occ.orca"
-    artifactId = "orca.so"
-    publishVersion = pVersion
-    desc = ""
-    website = "https://github.com/ShowMeThe/Orca"
-    bintrayUser = properties.getProperty("username")
-    bintrayKey = properties.getProperty("password")
-    dryRun = false
-}
-
 
 val parentDir = project.rootDir.path
 val orca_core = file(parentDir + File.separator + "orca-core")
