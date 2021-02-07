@@ -57,7 +57,6 @@ fun getJarFile(project: Project):Any{
     return project.zipTree("build/libs/plugin.jar")
 }
 
-tasks.getByName("jar").finalizedBy("zipNative")
 
 repositories {
     mavenCentral()
