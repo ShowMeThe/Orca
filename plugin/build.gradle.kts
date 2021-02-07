@@ -34,7 +34,7 @@ val archivesBaseName = "orca.so"
 task("zipNative",Zip::class){
     destinationDir = project.file("build/libs")
     archiveName  = "$archivesBaseName-${pVersion}.jarx"
-    from(project.zipTree("build/libs/plugin.jar"))
+    from(getJarFile(project))
     include("META-INF/**")
     include("com/**")
     from(orca_core.canonicalPath)
@@ -50,13 +50,14 @@ task("zipNative",Zip::class){
     }
 }
 
-tasks.getByName("jar"){
-    finalizedBy("zipNative").apply {
-        project.file("build/libs").listFiles()?.forEach {
-            println("file: ${it.name}")
-        }
+fun getJarFile(project: Project):Any{
+    project.file("build/libs").listFiles()?.forEach {
+        println("JarFile: ${it.name}")
     }
+    return project.zipTree("build/libs/plugin.jar")
 }
+
+tasks.getByName("jar").finalizedBy("zipNative")
 
 repositories {
     mavenCentral()
