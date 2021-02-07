@@ -26,9 +26,17 @@
  1、 先在项目的build.gradle的buildscript下的dependencies添加以下内容:
   ```gradle
   
-  dependencies {
-        classpath "com.occ.orca:orca.so:2.0.0-release08"
-    }
+    //根目录的build.gradle
+    buildscript {
+  		repositories {
+  			...
+  			maven { url 'https://jitpack.io' }
+  		}
+  	}
+
+    dependencies {
+          classpath "com.github.ShowMeThe:Orca:2.0.0-release09"
+      }
   
   ```
  2、进入你的项目build.gradle添加plugin的配置，能独立兼容:app项目及:Library项目，但会生成各自不同的.So，建议把加密的内容添加到单独Library中，让主项目引入此Library
