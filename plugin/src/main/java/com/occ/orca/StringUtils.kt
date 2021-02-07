@@ -9,7 +9,7 @@ object StringUtils {
 
     @JvmStatic
     fun md5(string: String): String? {
-        var md5: MessageDigest? = null
+        val md5: MessageDigest?
         try {
             md5 = MessageDigest.getInstance("MD5")
         } catch (e: Exception) {
@@ -26,10 +26,10 @@ object StringUtils {
         val md5Bytes = md5!!.digest(byteArray)
         val hexValue = StringBuffer()
         for (i in md5Bytes.indices) {
-            val `val` = md5Bytes[i].toInt() and 0xff
-            if (`val` < 16)
+            val value = md5Bytes[i].toInt() and 0xff
+            if (value < 16)
                 hexValue.append("0")
-            hexValue.append(Integer.toHexString(`val`))
+            hexValue.append(Integer.toHexString(value))
         }
         return hexValue.toString()
     }

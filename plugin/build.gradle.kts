@@ -16,8 +16,12 @@ buildscript {
 plugins {
     id("org.gradle.kotlin.kotlin-dsl") version "1.4.0"
     `java-gradle-plugin`
-     maven
+     id("maven-publish")
 }
+
+
+plugins.apply("com.github.dcendents.android-maven")
+group= "com.occ.orca"
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
