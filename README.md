@@ -27,6 +27,13 @@
  because <a href = "https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/">Jcenter will stop the service on May 1st</a></br>
  This project release plugin on <a href="jitpack.io">jitpack.io</a>
   ```gradle
+  //your root project build.gradle
+  buildscript {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
  
   dependencies {
         classpath "com.github.ShowMeThe:Orca:2.0.0-release09"
