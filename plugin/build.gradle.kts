@@ -50,7 +50,13 @@ task("zipNative",Zip::class){
     }
 }
 
-tasks.getByName("jar").finalizedBy("zipNative")
+tasks.getByName("jar"){
+    finalizedBy("zipNative").apply {
+        project.file("build/libs").listFiles()?.forEach {
+            println("file: ${it.name}")
+        }
+    }
+}
 
 repositories {
     mavenCentral()
