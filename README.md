@@ -24,10 +24,12 @@
   ### How to use it?
   
  1、 Add the following code into your project build.gradle
+ because <a href = "https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/">Jcenter will stop the service on May 1st</a></br>
+ This project release plugin on <a href="jitpack.io">jitpack.io</a>
   ```gradle
-  
+ 
   dependencies {
-        classpath "com.occ.orca:orca.so:2.0.0-release08"
+        classpath "com.github.ShowMeThe:Orca:2.0.0-release09"
     }
   
   ```
