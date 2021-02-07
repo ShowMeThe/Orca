@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.application'
-    id 'Orca.So'
     id 'kotlin-android'
 }
 
@@ -19,17 +18,6 @@ android {
     }
 
 
-
-    Orca.go{
-        storeSet{
-            "data"{
-                value = "4444444444"
-            }
-            "1223"{
-                value = "888888"
-            }
-        }
-    }
 
 
     buildTypes {
@@ -57,7 +45,6 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation project(":test")
 }
 
 
