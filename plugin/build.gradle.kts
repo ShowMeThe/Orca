@@ -50,7 +50,7 @@ task("zipNative",Zip::class){
     }
 }
 
-task("jar").finalizedBy("zipNative")
+tasks.getByName("jar").finalizedBy("zipNative")
 
 
 repositories {
