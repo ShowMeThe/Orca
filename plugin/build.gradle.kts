@@ -14,14 +14,14 @@ buildscript {
 
 
 plugins {
-    id("org.gradle.kotlin.kotlin-dsl") version "1.4.0"
+    `kotlin-dsl`
     `java-gradle-plugin`
      id("maven-publish")
 }
 
 
-plugins.apply("com.github.dcendents.android-maven")
-group= "com.occ.orca"
+
+
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
@@ -31,10 +31,11 @@ val pVersion = "2.0.0-release09"
 val parentDir = project.rootDir.path
 val orca_core = file(parentDir + File.separator + "orca-core")
 val archivesBaseName = "Orca"
+var jarFile = "build/libs/plugin-$pVersion.jar"
 task("zipNative",Zip::class){
     destinationDir = project.file("build/libs")
     archiveName  = "$archivesBaseName-${pVersion}.jarx"
-    from(project.zipTree(getAnyJarPath(project)))
+    from(project.zipTree(jarFile))
     include("META-INF/**")
     include("com/**")
     from(orca_core.canonicalPath)
@@ -43,26 +44,15 @@ task("zipNative",Zip::class){
     exclude("src/main/AndroidManifest.xml")
 
     doLast {
-        val originJar = project.file(getAnyJarPath(project))
+        val originJar = project.file(jarFile)
         val xJar = project.file("build/libs/$archivesBaseName-${pVersion}.jarx")
         originJar.delete()
         xJar.renameTo(originJar)
     }
 }
 
-fun getAnyJarPath(project: Project):Any{
-    val rootDir = "build/libs/"
-    val files =  project.file(rootDir).listFiles()
-    for(file in files){
-        if(file.path.endsWith("jar")){
-            return file.path
-        }
-    }
-    return ""
-}
 
 tasks.getByName("jar").finalizedBy("zipNative")
-
 
 repositories {
     mavenCentral()
@@ -86,5 +76,9 @@ gradlePlugin {
     }
 }
 
+
+plugins.apply("com.github.dcendents.android-maven")
+group = "com.occ.orca"
+version = pVersion
 
 
