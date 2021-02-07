@@ -25,7 +25,7 @@ group= "com.occ.orca"
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
-val pVersion = "2.0.0-release08"
+val pVersion = "2.0.0-release09"
 
 
 val parentDir = project.rootDir.path
@@ -34,7 +34,7 @@ val archivesBaseName = "Orca"
 task("zipNative",Zip::class){
     destinationDir = project.file("build/libs")
     archiveName  = "$archivesBaseName-${pVersion}.jarx"
-    from("build/libs/$archivesBaseName-${pVersion}.jar")
+    from(project.zipTree("build/libs/$archivesBaseName-${pVersion}.jar"))
     include("META-INF/**")
     include("com/**")
     from(orca_core.canonicalPath)
