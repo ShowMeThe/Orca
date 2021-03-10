@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'Orca.So'
+   // id 'Orca.So'
     id 'kotlin-android'
 }
 
@@ -19,13 +19,13 @@ android {
     }
 
 
-    Orca.go{
+  /*  Orca.go{
         storeSet{
             "data"{
                 value "123456"
             }
         }
-    }
+    }*/
 
 
     buildTypes {

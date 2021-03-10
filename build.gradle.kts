@@ -19,7 +19,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${rootProject.extra["kotlin_version"]}")
         classpath("org.jetbrains.kotlin:kotlin-android-extensions:${rootProject.extra["kotlin_version"]}")
         classpath("com.github.dcendents:android-maven-gradle-plugin:2.1")
-        classpath("com.github.ShowMeThe:Orca:2.0.0-release10")
+        //classpath("com.github.ShowMeThe:Orca:2.0.0-release10")
     }
 
 }
