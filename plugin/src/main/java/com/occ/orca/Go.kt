@@ -20,6 +20,8 @@ class Go(val project: Project) {
 
     var secretKey = ""
 
+    var isDebug = false
+
     fun storeSet(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
         println("encrypt start closure")
         keys.configure(closure)

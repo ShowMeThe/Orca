@@ -129,6 +129,7 @@ class OrcaPlugin : Plugin<Project> {
             task.secretKey = go.secretKey
         }
         task.keys = go.keys
+        task.isDebug = go.isDebug
         task.header = project.name
         task.signature = localSignature
         task.inputFileDir = File("$cmakeListsDir/src/main/cpp/include")

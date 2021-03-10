@@ -19,4 +19,6 @@
 
 #define SECRET_KEY ""
 
+#define DEBUG false
+
 #endif //ORCA_CORE_CLIENT_H
