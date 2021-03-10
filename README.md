@@ -73,7 +73,7 @@ Orca.go{
                 value "123456"
             }
         }
-	isDebug = true // when isDebug is true , signature can be setting a empty string value. Default value is false
+	isDebug = true // when isDebug is true , signature can be set as an empty string value. Default value is false
 	signature = "your .jks signature"
         secretKey = "FTat46cvyia6758@243lid66wxzvwe23dgfhcfg76wsd@5as431aq1256dsaa211" //This is the default key , you must replace it
     }
