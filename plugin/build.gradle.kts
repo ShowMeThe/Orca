@@ -69,8 +69,8 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        create("Orca.So") {
-            id = "Orca.So"
+        create("Orca") {
+            id = "Orca"
             implementationClass = "com.occ.orca.OrcaPlugin"
         }
     }
