@@ -12,12 +12,12 @@ class encryption {
 
 private:
     JNIEnv *jniEnv;
-    jobject context;
+    jobject _context;
 
 public:
     encryption(JNIEnv *jniEnv, jobject context);
 
-    const char *decrypt(const char *key, const char *cipher_message);
+    const char *decrypt(const char *key, const char *data);
 };
 
 

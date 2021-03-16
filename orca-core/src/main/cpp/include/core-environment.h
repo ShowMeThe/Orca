@@ -13,9 +13,8 @@ class environment{
 
 private:
     JNIEnv *jniEnv;
-    jobject context;
+    jobject _context;
     jobject getPackageInfo();
-
     jstring getPackageName();
 
 
@@ -27,9 +26,7 @@ public:
 
     jobject getApplicationContext(jobject context);
 
-
     jobject getContext();
-
 };
 
 

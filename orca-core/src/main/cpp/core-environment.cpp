@@ -11,7 +11,7 @@ using namespace std;
 
 environment::environment(JNIEnv *jniEnv, jobject context) {
     this->jniEnv = jniEnv;
-    this->context = getApplicationContext(context);
+    this->_context = getApplicationContext(context);
 }
 
 
@@ -55,11 +55,11 @@ bool environment::checkSignature() {
 
 
 jobject environment::getPackageInfo() {
-    jclass context_clz = jniEnv->GetObjectClass(context);
+    jclass context_clz = jniEnv->GetObjectClass(_context);
     jmethodID get_package_manager_method_id = jniEnv->GetMethodID(context_clz,
                                                                   "getPackageManager",
                                                                   "()Landroid/content/pm/PackageManager;");
-    jobject package_manager = jniEnv->CallObjectMethod(context, get_package_manager_method_id);
+    jobject package_manager = jniEnv->CallObjectMethod(_context, get_package_manager_method_id);
     jclass package_manager_clz = jniEnv->GetObjectClass(package_manager);
     jmethodID get_package_info_method_id = jniEnv->GetMethodID(package_manager_clz,
                                                                "getPackageInfo",
@@ -74,11 +74,11 @@ jobject environment::getPackageInfo() {
 
 
 jstring environment::getPackageName() {
-    jclass context_clz = jniEnv->GetObjectClass(context);
+    jclass context_clz = jniEnv->GetObjectClass(_context);
     jmethodID get_package_name_method_id = jniEnv->GetMethodID(context_clz,
                                                                "getPackageName",
                                                                "()Ljava/lang/String;");
-    jstring packageName = (jstring) jniEnv->CallObjectMethod(context,
+    jstring packageName = (jstring) jniEnv->CallObjectMethod(_context,
                                                              get_package_name_method_id);
     jniEnv->DeleteLocalRef(context_clz);
     return packageName;
@@ -86,7 +86,7 @@ jstring environment::getPackageName() {
 
 
 jobject environment::getContext() {
-    return context;
+    return _context;
 }
 
 

@@ -7,10 +7,10 @@
 
 encryption::encryption(JNIEnv *jniEnv, jobject context) {
     this->jniEnv = jniEnv;
-    this->context = context;
+    this->_context = context;
 }
 
-const char *encryption::decrypt(const char *key, const char *cipher_message) {
+const char *encryption::decrypt(const char *key, const char *data) {
 
     jclass encrypt_clz = jniEnv->FindClass("com/occ/encrypt/AESEncryption");
     if (encrypt_clz != NULL) {
@@ -18,7 +18,7 @@ const char *encryption::decrypt(const char *key, const char *cipher_message) {
                                                                 "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
         if (decrypt_method_id != NULL) {
             jstring keyString = jniEnv->NewStringUTF(key);
-            jstring cipherString = jniEnv->NewStringUTF(cipher_message);
+            jstring cipherString = jniEnv->NewStringUTF(data);
             jstring result = (jstring) jniEnv->CallStaticObjectMethod(encrypt_clz,
                                                                       decrypt_method_id, keyString,
                                                                       cipherString);
