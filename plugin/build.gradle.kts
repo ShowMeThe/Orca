@@ -25,7 +25,7 @@ plugins {
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
-val pVersion = "2.0.0-release10"
+val pVersion = "2.0.0-release13"
 
 
 val parentDir = project.rootDir.path
@@ -52,7 +52,7 @@ task("zipNative",Zip::class){
 }
 
 
-//tasks.getByName("jar").finalizedBy("zipNative")
+tasks.getByName("jar").finalizedBy("zipNative")
 
 repositories {
     mavenCentral()
@@ -77,10 +77,8 @@ gradlePlugin {
 }
 
 
-/*
 plugins.apply("com.github.dcendents.android-maven")
 group = "com.occ.orca"
 version = pVersion
-*/
 
 

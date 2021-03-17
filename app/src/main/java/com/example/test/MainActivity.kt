@@ -1,11 +1,7 @@
 package com.example.test
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.TextView
-import com.orcc.app.core.CoreClient
-import java.io.File
+import androidx.appcompat.app.AppCompatActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -16,9 +12,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        findViewById<TextView>(R.id.tv).apply {
+        /*findViewById<TextView>(R.id.tv).apply {
             text = CoreClient.getData()
-        }
+        }*/
 
 
 

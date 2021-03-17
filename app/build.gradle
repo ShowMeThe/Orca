@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.application'
-    id 'Orca'
     id 'kotlin-android'
 }
 
@@ -19,7 +18,7 @@ android {
     }
 
 
-    Orca.go{
+    /*Orca.go{
         isDebug = true
         encryptMode = "des"
         storeSet{
@@ -27,7 +26,7 @@ android {
                 value "123456"
             }
         }
-    }
+    }*/
 
 
     buildTypes {
