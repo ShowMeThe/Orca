@@ -52,7 +52,7 @@ task("zipNative",Zip::class){
 }
 
 
-tasks.getByName("jar").finalizedBy("zipNative")
+//tasks.getByName("jar").finalizedBy("zipNative")
 
 repositories {
     mavenCentral()
@@ -77,8 +77,10 @@ gradlePlugin {
 }
 
 
+/*
 plugins.apply("com.github.dcendents.android-maven")
 group = "com.occ.orca"
 version = pVersion
+*/
 
 

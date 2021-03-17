@@ -26,13 +26,19 @@ class OrcaPlugin : Plugin<Project> {
 
     private fun getPluginAttachProject(project: Project) {
         println("getPluginAttachProject ${project.name}")
-        val testedExtension = project.extensions.getByType(TestedExtension::class.java)
-        if (testedExtension is AppExtension) {
-            println("AppExtension")
-            attach2App(testedExtension, project)
-        } else if (testedExtension is LibraryExtension) {
-            println("LibraryExtension")
-            attach2Lib(testedExtension, project)
+        project.plugins.withId("com.android.application"){
+            val testedExtension = project.extensions.getByType(TestedExtension::class.java)
+            if (testedExtension is AppExtension) {
+                println("AppExtension")
+                attach2App(testedExtension, project)
+            }
+        }
+        project.plugins.withId("com.android.library"){
+            val testedExtension = project.extensions.getByType(TestedExtension::class.java)
+            if (testedExtension is LibraryExtension) {
+                println("LibraryExtension")
+                attach2Lib(testedExtension, project)
+            }
         }
     }
 
@@ -132,6 +138,7 @@ class OrcaPlugin : Plugin<Project> {
         task.isDebug = go.isDebug
         task.header = project.name
         task.signature = localSignature
+        task.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)
         task.inputFileDir = File("$cmakeListsDir/src/main/cpp/include")
 
         project.getTasksByName(
@@ -151,10 +158,23 @@ class OrcaPlugin : Plugin<Project> {
         generateJavaClientTask.outputDir = outputDir
         variant.registerJavaGeneratingTask(generateJavaClientTask, outputDir)
 
+        val mode = go.encryptMode.toUpperCase(Locale.ENGLISH)
+        val path = when (mode) {
+            "AES" -> {
+                "aes"
+            }
+            "DES" -> {
+                "des"
+            }
+            else -> {
+                "aes"
+            }
+        }
+
         val copyAESEncryptionTask = project.tasks.create("copyJavaCode${StringUtils.substring(variant.name)}",
             Copy::class.java){
             from(nativeOriginPath)
-            include("src/main/java/**")
+            include("src/main/java/com/occ/encrypt/${path}/**")
             into(outputDir)
         }
         generateJavaClientTask.dependsOn(copyAESEncryptionTask)

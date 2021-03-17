@@ -1,4 +1,4 @@
-package com.occ.encrypt
+package com.occ.encrypt.aes
 
 import android.util.Base64
 import java.io.UnsupportedEncodingException

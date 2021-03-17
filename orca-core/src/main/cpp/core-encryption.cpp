@@ -3,7 +3,8 @@
 //
 
 #include "include/core-encryption.h"
-
+#include "include/core-client.h"
+using namespace std;
 
 encryption::encryption(JNIEnv *jniEnv, jobject context) {
     this->jniEnv = jniEnv;
@@ -11,8 +12,14 @@ encryption::encryption(JNIEnv *jniEnv, jobject context) {
 }
 
 const char *encryption::decrypt(const char *key, const char *data) {
-
-    jclass encrypt_clz = jniEnv->FindClass("com/occ/encrypt/AESEncryption");
+    string class_path = "com/occ/encrypt/AESEncryption";
+    string mode = MODE;
+    if(mode == "AES"){
+        class_path = "com/occ/encrypt/aes/AESEncryption";
+    }else if(mode == "DES"){
+        class_path = "com/occ/encrypt/des/DESEncryption";
+    }
+    jclass encrypt_clz = jniEnv->FindClass(class_path.data());
     if (encrypt_clz != NULL) {
         jmethodID decrypt_method_id = jniEnv->GetStaticMethodID(encrypt_clz, "decrypt",
                                                                 "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");

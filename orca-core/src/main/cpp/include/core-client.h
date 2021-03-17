@@ -19,6 +19,8 @@
 
 #define SECRET_KEY ""
 
+#define MODE "AES"
+
 #define DEBUG false
 
 #endif //ORCA_CORE_CLIENT_H

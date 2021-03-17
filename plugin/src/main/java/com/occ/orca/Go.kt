@@ -22,6 +22,8 @@ class Go(val project: Project) {
 
     var isDebug = false
 
+    var encryptMode = "AES"
+
     fun storeSet(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
         println("encrypt start closure")
         keys.configure(closure)
