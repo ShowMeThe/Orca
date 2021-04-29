@@ -36,7 +36,7 @@
 	}
  
   dependencies {
-        classpath "com.github.ShowMeThe:Orca:2.0.0-release11"
+        classpath "com.github.ShowMeThe:Orca:2.0.0-release13"
     }
   
   ```
@@ -44,7 +44,7 @@
  ```gradle
  plugins {
     id 'com.android.application'
-    id 'Orca.So'
+    id 'Orca'
 }
  
  ```
@@ -55,7 +55,7 @@ For Kotlin Project:
 ```gradle
 plugins {
     id 'com.android.application'
-    id 'Orca.So'
+    id 'Orca'
     id 'kotlin-android'
 }
 
