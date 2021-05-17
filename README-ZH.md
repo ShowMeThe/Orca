@@ -72,7 +72,7 @@ Orca.go{
         }
         encryptMode = "AES" or "DES" 选择不同的加密方法，不区分大小写
         isDebug = true // isDebug 为true时候，将会跳过判断signature的处理，默认为false
-	      signature = "your .jks signature" 你的jks签名
+	signature = "your .jks signature" 你的jks签名
         secretKey = "FTat46cvyia6758@243lid66wxzvwe23dgfhcfg76wsd@5as431aq1256dsaa211" //默认加密的加密秘钥
     }
 
