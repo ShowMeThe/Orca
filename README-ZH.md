@@ -43,7 +43,7 @@
  ```gradle
  plugins {
     id 'com.android.application'
-    id 'Orca.So'
+    id 'Orca' //记得大写
 }
  
  ```
@@ -54,7 +54,7 @@ For Kotlin Project:
 ```gradle
 plugins {
     id 'com.android.application'
-    id 'Orca.So'
+    id 'Orca'
     id 'kotlin-android'
 }
 
@@ -70,7 +70,10 @@ Orca.go{
                 value "123456"
             }
         }
-        secretKey = "FTat46cvyia6758@243lid66wxzvwe23dgfhcfg76wsd@5as431aq1256dsaa211" //This is the default key , you must replace it
+        encryptMode = "AES" or "DES" 选择不同的加密方法，不区分大小写
+        isDebug = true // isDebug 为true时候，将会跳过判断signature的处理，默认为false
+	      signature = "your .jks signature" 你的jks签名
+        secretKey = "FTat46cvyia6758@243lid66wxzvwe23dgfhcfg76wsd@5as431aq1256dsaa211" //默认加密的加密秘钥
     }
 
 ```
