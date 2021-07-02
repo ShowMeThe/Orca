@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.konan.properties.Properties
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
         google()
     }
     dependencies {
