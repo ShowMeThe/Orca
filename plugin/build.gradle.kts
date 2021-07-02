@@ -57,8 +57,8 @@ task("zipNative",Zip::class){
 tasks.getByName("jar").finalizedBy("zipNative")
 
 repositories {
-    mavenCentral()
     google()
+    mavenCentral()
     jcenter()
 }
 

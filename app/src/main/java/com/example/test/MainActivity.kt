@@ -3,7 +3,6 @@ package com.example.test
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.orcc.app.core.CoreClient
 
 
 class MainActivity : AppCompatActivity() {
@@ -15,7 +14,7 @@ class MainActivity : AppCompatActivity() {
 
 
         findViewById<TextView>(R.id.tv).apply {
-            text = CoreClient.getData()
+
         }
 
 

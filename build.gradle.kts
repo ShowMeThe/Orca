@@ -11,6 +11,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven{setUrl("https://maven.aliyun.com/nexus/content/groups/public/")}
         maven { setUrl("https://jitpack.io") }
     }
 
@@ -26,6 +27,7 @@ buildscript {
 allprojects {
     repositories {
         google()
+        maven{setUrl("https://maven.aliyun.com/nexus/content/groups/public/")}
         mavenCentral()
         maven { setUrl("https://jitpack.io") }
 
