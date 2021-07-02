@@ -1,5 +1,6 @@
 package com.occ.orca.task
 
+import com.occ.orca.Go
 import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
 import com.squareup.javapoet.*
@@ -27,26 +28,28 @@ open class GenerateJavaClientFileTask : DefaultTask() {
     lateinit var keys: NamedDomainObjectContainer<KeyExt>
 
     @Input
-    var isBuildKotlin = true
+    lateinit var go: Go
 
     @TaskAction
     fun generate() {
-        if(isBuildKotlin){
+        if (go.isBuildKotlin) {
             buildKotlin()
-        }else{
+        } else {
             buildJava()
         }
     }
 
     private fun buildKotlin() {
         val classes = com.squareup.kotlinpoet.TypeSpec.objectBuilder("CoreClient")
-            .addInitializerBlock(com.squareup.kotlinpoet.CodeBlock.builder()
-                .addStatement("System.loadLibrary(%S)", "${soHeadName}-core-client")
-                .build())
+            .addInitializerBlock(
+                com.squareup.kotlinpoet.CodeBlock.builder()
+                    .addStatement("System.loadLibrary(%S)", "${soHeadName}-core-client")
+                    .build()
+            )
 
         val nativeFunction = FunSpec.builder("getString")
             .addModifiers(KModifier.EXTERNAL)
-            .addParameter(ParameterSpec.builder("key",String::class).build())
+            .addParameter(ParameterSpec.builder("key", String::class).build())
             .returns(String::class)
             .build()
 
@@ -73,13 +76,13 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
 
 
-        val file = FileSpec.builder("com.orcc.${soHeadName}.core","CoreClient")
+        val file = FileSpec.builder("com.orcc.${soHeadName}.core", "CoreClient")
             .addType(classes.build())
             .build()
         file.writeTo(outputDir)
     }
 
-    private fun buildJava(){
+    private fun buildJava() {
         val classBuilder = TypeSpec.classBuilder("CoreClient")
             .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
             .addMethod(

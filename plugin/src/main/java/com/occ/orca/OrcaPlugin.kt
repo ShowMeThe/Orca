@@ -157,7 +157,7 @@ class OrcaPlugin : Plugin<Project> {
         generateJavaClientTask.keys = go.keys
         generateJavaClientTask.soHeadName = project.name
         generateJavaClientTask.outputDir = outputDir
-        generateJavaClientTask.isBuildKotlin = go.isBuildKotlin
+        generateJavaClientTask.go = go
         variant.registerJavaGeneratingTask(generateJavaClientTask, outputDir)
 
 
