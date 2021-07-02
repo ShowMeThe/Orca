@@ -80,7 +80,7 @@ gradlePlugin {
 }
 
 
-//plugins.apply("com.github.dcendents.android-maven")
+plugins.apply("com.github.dcendents.android-maven")
 group = "com.occ.orca"
 version = pVersion
 
