@@ -8,7 +8,7 @@ object StringUtils {
 
 
     @JvmStatic
-    fun md5(string: String): String? {
+    fun md5(string: String): String {
         val md5: MessageDigest?
         try {
             md5 = MessageDigest.getInstance("MD5")

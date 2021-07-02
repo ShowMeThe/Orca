@@ -9,6 +9,7 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
         classpath("com.novoda:bintray-release:0.9.2")
+
     }
 }
 
@@ -25,7 +26,7 @@ plugins {
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
-val pVersion = "2.0.0-release13"
+val pVersion = "2.0.0-release14"
 
 
 val parentDir = project.rootDir.path
@@ -33,8 +34,8 @@ val orca_core = file(parentDir + File.separator + "orca-core")
 val archivesBaseName = "Orca"
 var jarFile = "build/libs/plugin-$pVersion.jar"
 task("zipNative",Zip::class){
-    destinationDir = project.file("build/libs")
-    archiveName  = "$archivesBaseName-${pVersion}.jarx"
+    destinationDirectory.set(project.file("build/libs"))
+    archiveFileName.set("$archivesBaseName-${pVersion}.jarx")
     from(project.zipTree(jarFile))
     include("META-INF/**")
     include("com/**")
@@ -65,6 +66,7 @@ dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
     compileOnly("com.android.tools.build:gradle:4.0.1")
     implementation("com.squareup:javapoet:1.13.0")
+    implementation("com.squareup:kotlinpoet:1.9.0")
 }
 
 gradlePlugin {
@@ -77,7 +79,7 @@ gradlePlugin {
 }
 
 
-plugins.apply("com.github.dcendents.android-maven")
+//plugins.apply("com.github.dcendents.android-maven")
 group = "com.occ.orca"
 version = pVersion
 

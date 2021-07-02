@@ -17,7 +17,7 @@ environment::environment(JNIEnv *jniEnv, jobject context) {
 
 bool environment::checkSignature() {
     string origin;
-    origin = SIGNATURE;
+    origin = CA;
     if (origin.empty() && DEBUG) {
         LOG("SIGNATURE IS EMPTY");
         return true;

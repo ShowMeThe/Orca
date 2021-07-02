@@ -15,16 +15,16 @@ using namespace std;
 
 environment *environments;
 
-map<string, string> _map;
+map<string, string> local_map;
 
 
 extern "C"
 JNIEXPORT jstring JNICALL getString(JNIEnv *env,jclass clazz,jstring key_){
     const char *key = env->GetStringUTFChars(key_, nullptr);
     string keyStr(key);
-    string value = _map[keyStr];
+    string value = local_map[keyStr];
     auto *encryption = new class encryption(env, environments->getContext());
-    const char *result = encryption->decrypt(SECRET_KEY, value.c_str());
+    const char *result = encryption->decrypt(QA, value.c_str());
     env->ReleaseStringUTFChars(key_, key);
     return env->NewStringUTF(result);
 }
@@ -51,7 +51,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
     env->RegisterNatives(clazz, methods, sizeof(methods)/sizeof(JNINativeMethod));
 
-    LOAD_MAP(_map);
+    LOAD_MAP(local_map);
     return JNI_VERSION_1_6;
 }
 

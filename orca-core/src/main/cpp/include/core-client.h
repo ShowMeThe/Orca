@@ -13,11 +13,11 @@
 #define LOAD_MAP(_map) \
     _map["data"] = "hello world"; \
 
-#define SIGNATURE ""
+#define CA ""
 
 #define HEADER ""
 
-#define SECRET_KEY ""
+#define QA ""
 
 #define MODE "AES"
 

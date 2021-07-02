@@ -49,7 +49,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
                 "#include <map>\n" +
                 "#include <string>\n")
 
-        lines.add("#define SIGNATURE \"$signature\"\n")
+        lines.add("#define CA \"$signature\"\n")
 
         lines.add("#define HEADER \"$header\"\n")
 
@@ -57,7 +57,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
         lines.add("#define DEBUG $isDebug \n")
 
-        lines.add("#define SECRET_KEY \"$secretKey\"\n")
+        lines.add("#define QA \"$secretKey\"\n")
 
         lines.add("#define LOAD_MAP(_map) \\\n")
         keys.forEach {

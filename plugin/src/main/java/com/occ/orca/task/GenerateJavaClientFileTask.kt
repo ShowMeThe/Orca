@@ -3,6 +3,11 @@ package com.occ.orca.task
 import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
 import com.squareup.javapoet.*
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.PropertySpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.Input
@@ -21,8 +26,60 @@ open class GenerateJavaClientFileTask : DefaultTask() {
     @Input
     lateinit var keys: NamedDomainObjectContainer<KeyExt>
 
+    @Input
+    var isBuildKotlin = true
+
     @TaskAction
     fun generate() {
+        if(isBuildKotlin){
+            buildKotlin()
+        }else{
+            buildJava()
+        }
+    }
+
+    private fun buildKotlin() {
+        val classes = com.squareup.kotlinpoet.TypeSpec.objectBuilder("CoreClient")
+            .addInitializerBlock(com.squareup.kotlinpoet.CodeBlock.builder()
+                .addStatement("System.loadLibrary(%S)", "${soHeadName}-core-client")
+                .build())
+
+        val nativeFunction = FunSpec.builder("getString")
+            .addModifiers(KModifier.EXTERNAL)
+            .addParameter(ParameterSpec.builder("key",String::class).build())
+            .returns(String::class)
+            .build()
+
+        classes.addFunction(nativeFunction)
+
+        keys.forEach {
+            val name = it.name.let { name ->
+                return@let if (name.first().isDigit()) {
+                    "_$name"
+                } else {
+                    val newName = name.toCharArray()
+                    val char = newName[0]
+                    newName[0] = char.toUpperCase()
+                    String(newName)
+                }
+            }
+            classes.addFunction(
+                FunSpec.builder("get$name")
+                    .addModifiers(KModifier.PUBLIC)
+                    .addStatement("return getString(%S)", StringUtils.md5(it.name))
+                    .returns(String::class)
+                    .build()
+            )
+        }
+
+
+        val file = FileSpec.builder("com.orcc.${soHeadName}.core","CoreClient")
+            .addType(classes.build())
+            .build()
+        file.writeTo(outputDir)
+    }
+
+    private fun buildJava(){
         val classBuilder = TypeSpec.classBuilder("CoreClient")
             .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
             .addMethod(
@@ -69,7 +126,6 @@ open class GenerateJavaClientFileTask : DefaultTask() {
 
         JavaFile.builder("com.orcc.${soHeadName}.core", classBuilder.build()).build()
             .writeTo(outputDir)
-
     }
 
 }
