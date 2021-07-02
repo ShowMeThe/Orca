@@ -73,6 +73,7 @@ Orca.go{
                 value "123456"
             }
         }
+    isBuildKotlin = true // if true it will build kotlin class , else it builds Java class
 	encryptMode = "AES" or "DES" //choose a different encryptMode , ignore case
  	isDebug = true // when isDebug is true , signature can be set as an empty string value. Default value is false
 	signature = "your .jks signature"
