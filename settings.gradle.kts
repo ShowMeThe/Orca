@@ -1,4 +1,4 @@
-include(":plugin")
+includeBuild("plugin")
 include(":app")
-//include("orca-core")
+include("orca-core")
 rootProject.name = "orca"

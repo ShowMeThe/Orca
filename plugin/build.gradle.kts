@@ -68,6 +68,7 @@ dependencies {
     compileOnly("com.android.tools.build:gradle:4.0.1")
     implementation("com.squareup:javapoet:1.13.0")
     implementation("com.squareup:kotlinpoet:1.9.0")
+    implementation("org.javassist:javassist:3.20.0-GA")
 }
 
 gradlePlugin {
@@ -80,7 +81,7 @@ gradlePlugin {
 }
 
 
-plugins.apply("com.github.dcendents.android-maven")
+/*plugins.apply("com.github.dcendents.android-maven")*/
 group = "com.occ.orca"
 version = pVersion
 

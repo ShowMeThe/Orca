@@ -10,7 +10,6 @@ import com.occ.orca.task.GenerateOccSoHeaderTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
-import org.jetbrains.kotlin.gradle.utils.`is`
 import java.io.File
 import java.util.*
 
@@ -85,7 +84,7 @@ class OrcaPlugin : Plugin<Project> {
         }
 
         GenerateCMakeLists(project).apply {
-            lib_name = project.name
+            libName = project.name
             val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
             val cmakeListsPath = cmakeListsDir + File.separator + "CMakeLists.txt"
             if(!File(cmakeListsPath).exists()){
@@ -154,6 +153,7 @@ class OrcaPlugin : Plugin<Project> {
             "generate${StringUtils.substring(variant.name)}JavaClient",
             GenerateJavaClientFileTask::class.java
         )
+
         generateJavaClientTask.keys = go.keys
         generateJavaClientTask.soHeadName = project.name
         generateJavaClientTask.outputDir = outputDir
