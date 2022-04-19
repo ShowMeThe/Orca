@@ -72,7 +72,7 @@ class OrcaPlugin : Plugin<Project> {
         android: TestedExtension,
         project: Project
     ) {
-        println("copyNativeCode  $nativeOriginPath")
+        println("copyNativeCode  $nativeOriginPath nativeOriginPath file ${File(nativeOriginPath as String).exists()}")
         val file = File(project.buildDir.canonicalPath, "orca.so")
         println("copyNativeCode copy to target $file")
         if (!file.exists()) {
@@ -133,8 +133,9 @@ class OrcaPlugin : Plugin<Project> {
             localSignature = go.signature
         }
         val inputFile = File("$cmakeListsDir/src/main/cpp/include")
+        println("copyNativeCode inputFile ${inputFile.exists()}")
         if(inputFile.exists().not()){
-            val file = File(project.buildDir.canonicalPath, "orca.so")
+            val file = File(cmakeListsDir)
             println("copyNativeCode copy to target $file")
             if (!file.exists()) {
                 file.mkdirs()
