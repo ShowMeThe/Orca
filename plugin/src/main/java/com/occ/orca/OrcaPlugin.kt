@@ -73,7 +73,8 @@ class OrcaPlugin : Plugin<Project> {
         project: Project
     ) {
         println("copyNativeCode  $nativeOriginPath")
-        val file = File(project.buildDir, "orca.so")
+        val file = File(project.buildDir.canonicalPath, "orca.so")
+        println("copyNativeCode copy to target $file")
         if (!file.exists()) {
             file.mkdirs()
             project.copy {
