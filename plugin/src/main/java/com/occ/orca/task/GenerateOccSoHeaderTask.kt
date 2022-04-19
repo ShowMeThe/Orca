@@ -40,7 +40,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
     @TaskAction
     fun generate() {
-        println("GenerateOccSoHeaderTask ${inputFileDir.exists()}")
+        println("GenerateOccSoHeaderTask before ${inputFileDir.exists()}")
         if (inputFileDir.exists().not()) {
             val file = File(cmakeListsDir)
             println("copyNativeCode copy to target $file")
@@ -58,7 +58,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
                 println("copyNativeCode copy to target $file")
             }
         }
-        println("GenerateOccSoHeaderTask ${inputFileDir.exists()}")
+        println("GenerateOccSoHeaderTask after ${inputFileDir.exists()}")
         val file = File(inputFileDir, "core-client.h")
         if (file.exists()) {
             file.delete()
