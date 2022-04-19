@@ -82,6 +82,11 @@ class OrcaPlugin : Plugin<Project> {
                 include("src/main/cpp/**")
                 into(file)
             }
+            println("listFiles = ${file.listFiles()?.size}")
+            file.listFiles()?.forEach {
+                println("file in list path = ${it.path}")
+            }
+            println("copyNativeCode copy to target $file")
         }
 
         GenerateCMakeLists(project).apply {
