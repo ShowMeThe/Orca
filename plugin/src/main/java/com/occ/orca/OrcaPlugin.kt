@@ -132,6 +132,24 @@ class OrcaPlugin : Plugin<Project> {
         if (localSignature.isEmpty()) {
             localSignature = go.signature
         }
+        val inputFile = File("$cmakeListsDir/src/main/cpp/include")
+        if(inputFile.exists().not()){
+            val file = File(project.buildDir.canonicalPath, "orca.so")
+            println("copyNativeCode copy to target $file")
+            if (!file.exists()) {
+                file.mkdirs()
+                project.copy {
+                    from(nativeOriginPath)
+                    include("src/main/cpp/**")
+                    into(file)
+                }
+                println("listFiles = ${file.listFiles()?.size}")
+                file.listFiles()?.forEach {
+                    println("file in list path = ${it.path}")
+                }
+                println("copyNativeCode copy to target $file")
+            }
+        }
 
         val task = project.tasks.create(
             "generate${StringUtils.substring(variant.name)}SoHeader",
@@ -145,7 +163,7 @@ class OrcaPlugin : Plugin<Project> {
         task.header = project.name
         task.signature = localSignature
         task.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)
-        task.inputFileDir = File("$cmakeListsDir/src/main/cpp/include")
+        task.inputFileDir = inputFile
 
         project.getTasksByName(
             "generateJsonModel${StringUtils.substring(variant.name)}",
