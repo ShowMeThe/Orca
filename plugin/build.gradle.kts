@@ -17,7 +17,6 @@ buildscript {
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
-     id("maven-publish")
 }
 
 
