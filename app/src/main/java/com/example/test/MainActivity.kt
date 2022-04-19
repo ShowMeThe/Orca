@@ -1,8 +1,10 @@
 package com.example.test
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.orcc.app.core.CoreClient
 
 
 class MainActivity : AppCompatActivity() {
@@ -13,10 +15,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        findViewById<TextView>(R.id.tv).apply {
-
-        }
-
+        var lastTime = System.nanoTime()
+        var data = CoreClient.getData()
+        Log.e("MainActivity","${data} ${System.nanoTime() - lastTime}")
+        lastTime = System.nanoTime()
+        data = CoreClient.getData()
+        Log.e("MainActivity","${data} ${System.nanoTime() - lastTime}")
 
 
     }

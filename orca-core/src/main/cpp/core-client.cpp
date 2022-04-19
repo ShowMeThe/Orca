@@ -17,7 +17,6 @@ environment *environments;
 
 map<string, string> local_map;
 
-
 extern "C"
 JNIEXPORT jstring JNICALL getString(JNIEnv *env,jclass clazz,jstring key_){
     const char *key = env->GetStringUTFChars(key_, nullptr);

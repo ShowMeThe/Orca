@@ -6,12 +6,18 @@
 #include "include/core-client.h"
 using namespace std;
 
+map<string, char *> uKyMap;
+
 encryption::encryption(JNIEnv *jniEnv, jobject context) {
     this->jniEnv = jniEnv;
     this->_context = context;
 }
 
 const char *encryption::decrypt(const char *key, const char *data) {
+    char *value = uKyMap[key];
+    if(value != nullptr){
+        return value;
+    }
     string class_path = "com/occ/encrypt/AESEncryption";
     string mode = MODE;
     if(mode == "AES"){
@@ -29,7 +35,8 @@ const char *encryption::decrypt(const char *key, const char *data) {
             jstring result = (jstring) jniEnv->CallStaticObjectMethod(encrypt_clz,
                                                                       decrypt_method_id, keyString,
                                                                       cipherString);
-            const char *resultChars = jniEnv->GetStringUTFChars(result, JNI_FALSE);
+            char *resultChars = const_cast<char *>(jniEnv->GetStringUTFChars(result, JNI_FALSE));
+            uKyMap[key] = resultChars;
             jniEnv->DeleteLocalRef(keyString);
             jniEnv->DeleteLocalRef(cipherString);
             jniEnv->DeleteLocalRef(result);

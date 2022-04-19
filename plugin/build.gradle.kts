@@ -27,7 +27,7 @@ plugins {
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
-val pVersion = "2.0.0-release14"
+val pVersion = "2.1.0"
 
 
 val parentDir = project.rootDir.path
