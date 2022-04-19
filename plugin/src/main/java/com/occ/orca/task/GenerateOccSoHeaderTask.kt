@@ -11,8 +11,8 @@ import java.io.File
 
 open class GenerateOccSoHeaderTask : DefaultTask() {
 
-    @InputDirectory
-    lateinit var inputFileDir: File
+    @Input
+    var inputFileDirPath = ""
 
     @Input
     var nativeOriginPath = ""
@@ -40,6 +40,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
     @TaskAction
     fun generate() {
+        val inputFileDir = File(inputFileDirPath)
         println("GenerateOccSoHeaderTask before ${inputFileDir.exists()}")
         if (inputFileDir.exists().not()) {
             val file = File(cmakeListsDir)

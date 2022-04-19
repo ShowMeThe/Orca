@@ -147,7 +147,7 @@ class OrcaPlugin : Plugin<Project> {
         task.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)
         task.cmakeListsDir = cmakeListsDir
         task.cmakeListsDir = nativeOriginPath as String
-        task.inputFileDir = inputFile
+        task.inputFileDirPath = inputFile.path
 
         project.getTasksByName(
             "generateJsonModel${StringUtils.substring(variant.name)}",
