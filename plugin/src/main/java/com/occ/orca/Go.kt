@@ -20,7 +20,7 @@ class Go(val project: Project) {
 
     var secretKey = ""
 
-    var isDebug = false
+    var isDebug = true
 
     var encryptMode = "AES"
 

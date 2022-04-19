@@ -12,13 +12,15 @@ import com.squareup.kotlinpoet.PropertySpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.lang.model.element.Modifier
 
 open class GenerateJavaClientFileTask : DefaultTask() {
 
-    @Input
+    @InputDirectory
     lateinit var outputDir: File
 
     @Input

@@ -6,14 +6,12 @@ import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import java.io.File
 
 open class GenerateOccSoHeaderTask : DefaultTask() {
 
-    @Input
+    @InputDirectory
     lateinit var inputFileDir :File
 
     @Input
@@ -23,7 +21,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
     var header = ""
 
     @Input
-    var isDebug = false
+    var debug = false
 
     @Input
     var encryptMode = "AES" //AES,DES
@@ -55,7 +53,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
         lines.add("#define MODE \"$encryptMode\"\n")
 
-        lines.add("#define DEBUG $isDebug \n")
+        lines.add("#define DEBUG $debug \n")
 
         lines.add("#define QA \"$secretKey\"\n")
 
