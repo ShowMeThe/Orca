@@ -15,7 +15,7 @@ encryption::encryption(JNIEnv *jniEnv, jobject context) {
 
 const char *encryption::decrypt(const char *key, const char *data) {
     char *value = uKyMap[key];
-    if(value != nullptr){
+    if(value != NULL){
         return value;
     }
     string class_path = "com/occ/encrypt/AESEncryption";

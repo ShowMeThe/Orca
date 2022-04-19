@@ -17,7 +17,7 @@ android {
         consumerProguardFiles "consumer-rules.pro"
         externalNativeBuild {
             cmake {
-                cppFlags "-frtti -std=c++11"
+                cppFlags ""
             }
         }
     }
