@@ -12,7 +12,13 @@ import java.io.File
 open class GenerateOccSoHeaderTask : DefaultTask() {
 
     @InputDirectory
-    lateinit var inputFileDir :File
+    lateinit var inputFileDir: File
+
+    @Input
+    var nativeOriginPath = ""
+
+    @Input
+    var cmakeListsDir = ""
 
     @Input
     var signature = ""
@@ -34,18 +40,41 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
     @TaskAction
     fun generate() {
-        val file = File(inputFileDir,"core-client.h")
-        if(file.exists()){
+        println("GenerateOccSoHeaderTask ${inputFileDir.exists()}")
+        if (inputFileDir.exists().not()) {
+            val file = File(cmakeListsDir)
+            println("copyNativeCode copy to target $file")
+            if (!file.exists()) {
+                file.mkdirs()
+                project.copy {
+                    from(nativeOriginPath)
+                    include("src/main/cpp/**")
+                    into(file)
+                }
+                println("listFiles = ${file.listFiles()?.size}")
+                file.listFiles()?.forEach {
+                    println("file in list path = ${it.path}")
+                }
+                println("copyNativeCode copy to target $file")
+            }
+        }
+        println("GenerateOccSoHeaderTask ${inputFileDir.exists()}")
+        val file = File(inputFileDir, "core-client.h")
+        if (file.exists()) {
             file.delete()
         }
         file.createNewFile()
-        val lines =  ArrayList<String>()
-        lines.add("#ifndef ORCA_CORE_CLIENT_H\n" +
-                "#define ORCA_CORE_CLIENT_H\n")
+        val lines = ArrayList<String>()
+        lines.add(
+            "#ifndef ORCA_CORE_CLIENT_H\n" +
+                    "#define ORCA_CORE_CLIENT_H\n"
+        )
 
-        lines.add("#include <jni.h>\n" +
-                "#include <map>\n" +
-                "#include <string>\n")
+        lines.add(
+            "#include <jni.h>\n" +
+                    "#include <map>\n" +
+                    "#include <string>\n"
+        )
 
         lines.add("#define CA \"$signature\"\n")
 
