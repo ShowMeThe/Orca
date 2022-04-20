@@ -9,13 +9,13 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.occ.orca'
+                groupId = 'com.occ.core'
                 artifactId = 'core'
                 version = '2.1.0'
             }
             debug(MavenPublication) {
                 from components.debug
-                groupId = 'com.occ.orca'
+                groupId = 'com.occ.core'
                 artifactId = 'core'
                 version = '2.1.0'
             }
