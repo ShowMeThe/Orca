@@ -77,6 +77,19 @@ gradlePlugin {
 }
 
 
+afterEvaluate {
+    publishing{
+        publications {
+            create("release",MavenPublication::class.java){
+                from(components.findByName("release"))
+                groupId = "com.occ.orca"
+                artifactId = "orca"
+                version = pVersion
+            }
+        }
+    }
+}
+
 /*plugins.apply("com.github.dcendents.android-maven")*/
 group = "com.occ.orca"
 version = pVersion
