@@ -29,7 +29,6 @@ allprojects {
         mavenCentral()
         maven { setUrl("https://jitpack.io") }
         maven{setUrl("https://maven.aliyun.com/nexus/content/groups/public/")}
-        apply(plugin = "maven-publish")
     }
 }
 
