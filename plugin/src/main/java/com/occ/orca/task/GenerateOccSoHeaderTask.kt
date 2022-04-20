@@ -45,6 +45,10 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
         GenerateCMakeLists(project).apply {
             libName = project.name
             val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
+            val cmakeListsDirFile = File(cmakeListsDir)
+            if(cmakeListsDirFile.exists().not()){
+                cmakeListsDirFile.mkdirs()
+            }
             val cmakeListsPath = cmakeListsDir + File.separator + "CMakeLists.txt"
             val cmakeListFile = File(cmakeListsPath)
             if (cmakeListFile.exists()) {
