@@ -184,9 +184,12 @@ class OrcaPlugin : Plugin<Project> {
         return if (project.rootProject.subprojects.find { it.name == "orca-core" } != null) {
             project.rootProject.file("orca-core").canonicalPath
         } else {
-            var fileProject = findNativeFromBuildScript(project)
-            if (fileProject == null) {
-                fileProject = findNativeFromBuildScript(project.rootProject)
+            var fileProject : Any? = File(project.rootDir.path).listFiles()?.first { it.name == "orca-core" }?.path
+            if(fileProject == null){
+                fileProject = findNativeFromBuildScript(project)
+                if (fileProject == null) {
+                    fileProject = findNativeFromBuildScript(project.rootProject)
+                }
             }
             fileProject
         }
