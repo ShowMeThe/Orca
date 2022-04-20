@@ -203,7 +203,7 @@ class OrcaPlugin : Plugin<Project> {
         var result: Any? = null
         project.buildscript.configurations.forEach { config ->
             val file = config.files.find {
-                it.name.toUpperCase(Locale.getDefault()).contains("PLUGIN")
+                it.name.contains("plugin-2.0.0-alpha15.jar")
             }
             if (file != null) {
                 result = project.zipTree(file)
