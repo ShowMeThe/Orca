@@ -140,6 +140,7 @@ class OrcaPlugin : Plugin<Project> {
         task.signature = localSignature
         task.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)
         task.inputFileDirPath = File("$cmakeListsDir/src/main/cpp/include").path
+        task.nativeOriginPath = nativeOriginPath
 
         project.getTasksByName(
             "generateJsonModel${StringUtils.substring(variant.name)}",

@@ -83,7 +83,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
         lines.add("#define DEBUG $debug \n")
 
-        lines.add("#define QA \"$secretKey\"\n")
+        lines.add("#define SECRET_KEY \"$secretKey\"\n")
 
         lines.add("#define LOAD_MAP(_map) \\\n")
         keys.forEach {
