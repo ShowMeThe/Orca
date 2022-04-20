@@ -52,6 +52,7 @@ task("zipNative",Zip::class){
 
 tasks.getByName("jar").finalizedBy("zipNative")
 
+
 repositories {
     google()
     mavenCentral()
@@ -81,6 +82,7 @@ afterEvaluate {
     publishing{
         publications {
             create("release",MavenPublication::class.java){
+                from(components.getAt("java"))
                 groupId = "com.occ.orca"
                 artifactId = "orca"
                 version = pVersion
