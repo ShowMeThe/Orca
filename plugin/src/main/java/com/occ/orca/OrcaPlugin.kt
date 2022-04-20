@@ -72,42 +72,24 @@ class OrcaPlugin : Plugin<Project> {
         android: TestedExtension,
         project: Project
     ) {
-        println("copyNativeCode  $nativeOriginPath nativeOriginPath file ${File(nativeOriginPath as String).exists()}")
-        val file = File(project.buildDir.canonicalPath, "orca.so")
-        println("copyNativeCode copy to target $file")
-        if (!file.exists()) {
-            file.mkdirs()
-            project.copy {
-                from(nativeOriginPath)
-                include("src/main/cpp/**")
-                into(file)
-            }
-            println("listFiles = ${file.listFiles()?.size}")
-            file.listFiles()?.forEach {
-                println("file in list path = ${it.path}")
-            }
-            println("copyNativeCode copy to target $file")
+        val cmakeListsDir = File(project.buildDir.canonicalPath + File.separator + "orca.so")
+        if(cmakeListsDir.exists().not()){
+            cmakeListsDir.mkdirs()
         }
-
-        GenerateCMakeLists(project).apply {
-            libName = project.name
-            val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
-            val cmakeListsPath = cmakeListsDir + File.separator + "CMakeLists.txt"
-            if (!File(cmakeListsPath).exists()) {
-                build {
-                    setUpCmake(cmakeListsPath, android)
-                }
-            } else {
-                setUpCmake(cmakeListsPath, android)
-            }
+        val cmakeListsFile = File(cmakeListsDir.path + File.separator + "CMakeLists.txt")
+        project.copy {
+            from(nativeOriginPath)
+            include("CMakeLists.txt")
+            into(cmakeListsDir)
         }
-
+        println("copyNativeCode createNewFile ${cmakeListsDir.exists()}")
+        setUpCmake(cmakeListsFile, android)
     }
 
     /**
      * setUp cmake
      */
-    private fun setUpCmake(cmakeListsPath: String, android: TestedExtension) {
+    private fun setUpCmake(cmakeListsFile: File, android: TestedExtension) {
         android.defaultConfig {
             externalNativeBuild {
                 cmake {
@@ -117,7 +99,7 @@ class OrcaPlugin : Plugin<Project> {
         }
         android.externalNativeBuild {
             cmake {
-                path = File(cmakeListsPath)
+                path = cmakeListsFile
             }
         }
     }
@@ -146,7 +128,7 @@ class OrcaPlugin : Plugin<Project> {
         task.signature = localSignature
         task.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)
         task.cmakeListsDir = cmakeListsDir
-        task.cmakeListsDir = nativeOriginPath as String
+        task.nativeOriginPath = nativeOriginPath as String
         task.inputFileDirPath = inputFile.path
 
         project.getTasksByName(

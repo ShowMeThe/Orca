@@ -42,29 +42,39 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
     fun generate() {
         val inputFileDir = File(inputFileDirPath)
         println("GenerateOccSoHeaderTask before ${inputFileDir.exists()}")
+        GenerateCMakeLists(project).apply {
+            libName = project.name
+            val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
+            val cmakeListsPath = cmakeListsDir + File.separator + "CMakeLists.txt"
+            val cmakeListFile = File(cmakeListsPath)
+            if (cmakeListFile.exists()) {
+                cmakeListFile.delete()
+            }
+            if (cmakeListFile.exists().not()) {
+                build {}
+            }
+        }
         if (inputFileDir.exists().not()) {
             val file = File(cmakeListsDir)
             println("copyNativeCode copy to target $file")
-            if (!file.exists()) {
-                file.mkdirs()
+            if (!File(file.path + "src").exists()) {
                 project.copy {
                     from(nativeOriginPath)
                     include("src/main/cpp/**")
+                    exclude("src/main/cpp/include/core-client.h")
                     into(file)
                 }
-                println("listFiles = ${file.listFiles()?.size}")
-                file.listFiles()?.forEach {
-                    println("file in list path = ${it.path}")
-                }
-                println("copyNativeCode copy to target $file")
+                println("GenerateOccSoHeaderTask copyNativeCode copy to target $file")
             }
         }
-        println("GenerateOccSoHeaderTask after ${inputFileDir.exists()}")
-        val file = File(inputFileDir, "core-client.h")
+        println("GenerateOccSoHeaderTask after ${inputFileDir}")
+        val file = File(inputFileDir.path + File.separator + "core-client.h")
+        println("GenerateOccSoHeaderTask core-client ${file.path}")
         if (file.exists()) {
             file.delete()
         }
         file.createNewFile()
+        println("GenerateOccSoHeaderTask core-client file ${file.path}")
         val lines = ArrayList<String>()
         lines.add(
             "#ifndef ORCA_CORE_CLIENT_H\n" +
