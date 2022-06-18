@@ -1,11 +1,12 @@
 plugins {
     id 'com.android.application'
+    id 'Orca'
     id 'kotlin-android'
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.1"
+    compileSdkVersion 31
+    buildToolsVersion "31.0.0"
 
     defaultConfig {
         applicationId "com.orcinus.orca"
@@ -18,16 +19,16 @@ android {
     }
 
 
-//    Orca.go{
-//        isDebug = true
-//        encryptMode = "des"
-//        isBuildKotlin = false
-//        storeSet{
-//            "data"{
-//                value "88895565"
-//            }
-//        }
-//    }
+    Orca.go{
+        isDebug = true
+        encryptMode = "des"
+        isBuildKotlin = false
+        storeSet{
+            "data"{
+                value "88895565"
+            }
+        }
+    }
 
 
     buildTypes {

@@ -7,7 +7,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
         classpath("com.novoda:bintray-release:0.9.2")
 
     }
@@ -23,7 +23,7 @@ plugins {
 
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
-val pVersion = "2.1.0"
+val pVersion = "2.2.0"
 
 
 val parentDir = project.rootDir.path
@@ -62,7 +62,7 @@ repositories {
 dependencies {
     compileOnly(gradleApi())
     compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
-    compileOnly("com.android.tools.build:gradle:4.0.1")
+    compileOnly("com.android.tools.build:gradle:7.2.0")
     implementation("com.squareup:javapoet:1.13.0")
     implementation("com.squareup:kotlinpoet:1.9.0")
     implementation("org.javassist:javassist:3.20.0-GA")

@@ -27,14 +27,14 @@ open class GenerateJavaClientFileTask : DefaultTask() {
     lateinit var soHeadName: String
 
     @Input
-    lateinit var keys: NamedDomainObjectContainer<KeyExt>
+    lateinit var keys: List<KeyExt>
 
     @Input
-    lateinit var go: Go
+    var buildWithKotlin : Boolean = false
 
     @TaskAction
     fun generate() {
-        if (go.isBuildKotlin) {
+        if (buildWithKotlin) {
             buildKotlin()
         } else {
             buildJava()

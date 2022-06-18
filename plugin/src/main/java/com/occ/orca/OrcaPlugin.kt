@@ -26,14 +26,14 @@ class OrcaPlugin : Plugin<Project> {
 
     private fun getPluginAttachProject(project: Project) {
         println("getPluginAttachProject ${project.name}")
-        project.plugins.withId("com.android.application"){
+        project.plugins.withId("com.android.application") {
             val testedExtension = project.extensions.getByType(TestedExtension::class.java)
             if (testedExtension is AppExtension) {
                 println("AppExtension")
                 attach2App(testedExtension, project)
             }
         }
-        project.plugins.withId("com.android.library"){
+        project.plugins.withId("com.android.library") {
             val testedExtension = project.extensions.getByType(TestedExtension::class.java)
             if (testedExtension is LibraryExtension) {
                 println("LibraryExtension")
@@ -47,7 +47,7 @@ class OrcaPlugin : Plugin<Project> {
         copyNativeCode(nativeOriginPath, android, target)
         target.afterEvaluate {
             android.libraryVariants.all {
-                buildTask(nativeOriginPath,this, target)
+                buildTask(nativeOriginPath, this, target)
             }
         }
     }
@@ -58,7 +58,7 @@ class OrcaPlugin : Plugin<Project> {
         copyNativeCode(nativeOriginPath, android, target)
         target.afterEvaluate {
             android.applicationVariants.all {
-                buildTask(nativeOriginPath,this, target)
+                buildTask(nativeOriginPath, this, target)
             }
         }
     }
@@ -87,11 +87,12 @@ class OrcaPlugin : Plugin<Project> {
             libName = project.name
             val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
             val cmakeListsPath = cmakeListsDir + File.separator + "CMakeLists.txt"
-            if(!File(cmakeListsPath).exists()){
+            println("GenerateCMakeLists = $cmakeListsPath")
+            if (!File(cmakeListsPath).exists()) {
                 build {
                     setUpCmake(cmakeListsPath, android)
                 }
-            }else{
+            } else {
                 setUpCmake(cmakeListsPath, android)
             }
         }
@@ -101,7 +102,7 @@ class OrcaPlugin : Plugin<Project> {
     /**
      * setUp cmake
      */
-    private fun setUpCmake(cmakeListsPath:String,android: TestedExtension){
+    private fun setUpCmake(cmakeListsPath: String, android: TestedExtension) {
         android.defaultConfig {
             externalNativeBuild {
                 cmake {
@@ -120,7 +121,7 @@ class OrcaPlugin : Plugin<Project> {
     /**
      * build task
      */
-    private fun buildTask(nativeOriginPath:Any?,variant: BaseVariant, project: Project) {
+    private fun buildTask(nativeOriginPath: Any?, variant: BaseVariant, project: Project) {
         val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
         val go = (project.extensions.findByName("Orca") as Orca).go
         if (localSignature.isEmpty()) {
@@ -142,12 +143,13 @@ class OrcaPlugin : Plugin<Project> {
         task.inputFileDirPath = File("$cmakeListsDir/src/main/cpp/include").path
         task.nativeOriginPath = nativeOriginPath
 
-        project.getTasksByName(
-            "generateJsonModel${StringUtils.substring(variant.name)}",
-            false
-        ).forEach {
-            it.dependsOn(task)
+        val configTask = project.tasks.filter{
+            it.name.startsWith("configureCMake${StringUtils.substring(variant.name)}")
         }
+        println("configureCMake $configTask")
+        configTask.forEach {
+                it.dependsOn(task)
+            }
 
         val outputDir = File(project.buildDir, "/generated/source/orca/${variant.name}")
         val generateJavaClientTask = project.tasks.create(
@@ -155,10 +157,10 @@ class OrcaPlugin : Plugin<Project> {
             GenerateJavaClientFileTask::class.java
         )
 
-        generateJavaClientTask.keys = go.keys
+        generateJavaClientTask.keys = go.keys.toMutableList()
         generateJavaClientTask.soHeadName = project.name
         generateJavaClientTask.outputDir = outputDir
-        generateJavaClientTask.go = go
+        generateJavaClientTask.buildWithKotlin = go.isBuildKotlin
         variant.registerJavaGeneratingTask(generateJavaClientTask, outputDir)
 
 
@@ -175,8 +177,10 @@ class OrcaPlugin : Plugin<Project> {
             }
         }
 
-        val copyAESEncryptionTask = project.tasks.create("copyJavaCode${StringUtils.substring(variant.name)}",
-            Copy::class.java){
+        val copyAESEncryptionTask = project.tasks.create(
+            "copyJavaCode${StringUtils.substring(variant.name)}",
+            Copy::class.java
+        ) {
             from(nativeOriginPath)
             include("src/main/java/com/occ/encrypt/${path}/**")
             into(outputDir)
@@ -185,6 +189,7 @@ class OrcaPlugin : Plugin<Project> {
 
 
     }
+
     /**
      * find C++ root
      */
@@ -204,7 +209,7 @@ class OrcaPlugin : Plugin<Project> {
         var result: Any? = null
         project.buildscript.configurations.forEach { config ->
             val file = config.files.find {
-                it.path.contains("orca",true) && it.name.contains("plugin",true)
+                it.path.contains("orca", true) && it.name.contains("plugin", true)
             }
             if (file != null) {
                 result = project.zipTree(file)
