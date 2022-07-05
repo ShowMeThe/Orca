@@ -1,19 +1,20 @@
 package com.occ.orca.task
 
-import com.occ.orca.Go
 import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
-import com.squareup.javapoet.*
+import com.squareup.javapoet.CodeBlock
+import com.squareup.javapoet.JavaFile
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.TypeSpec
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.PropertySpec
 import org.gradle.api.DefaultTask
-import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.lang.model.element.Modifier

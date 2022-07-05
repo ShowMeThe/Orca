@@ -1,15 +1,22 @@
 package com.occ.orca
 
-import com.android.build.gradle.AppExtension
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.artifact.MultipleArtifact
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.Variant
 import com.android.build.gradle.TestedExtension
-import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.occ.orca.task.GenerateCMakeLists
 import com.occ.orca.task.GenerateJavaClientFileTask
 import com.occ.orca.task.GenerateOccSoHeaderTask
+import javassist.ClassPool
+import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.register
 import java.io.File
 import java.util.*
 
@@ -28,41 +35,31 @@ class OrcaPlugin : Plugin<Project> {
         println("getPluginAttachProject ${project.name}")
         project.plugins.withId("com.android.application") {
             val testedExtension = project.extensions.getByType(TestedExtension::class.java)
-            if (testedExtension is AppExtension) {
-                println("AppExtension")
-                attach2App(testedExtension, project)
-            }
+            attach(testedExtension, project)
         }
         project.plugins.withId("com.android.library") {
             val testedExtension = project.extensions.getByType(TestedExtension::class.java)
-            if (testedExtension is LibraryExtension) {
-                println("LibraryExtension")
-                attach2Lib(testedExtension, project)
-            }
+            attach(testedExtension, project)
         }
     }
 
-    private fun attach2Lib(android: LibraryExtension, target: Project) {
-        val nativeOriginPath = getNativeFile(target)
-        copyNativeCode(nativeOriginPath, android, target)
-        target.afterEvaluate {
-            android.libraryVariants.all {
-                buildTask(nativeOriginPath, this, target)
+    private fun attach(android: TestedExtension, project: Project) {
+        val nativeOriginPath = getNativeFile(project)
+        copyNativeCode(nativeOriginPath, android, project)
+        project.extensions.getByType(AndroidComponentsExtension::class.java).onVariants {
+            android.sourceSets{
+                val outputDir = File(project.buildDir, "/generated/source/orca/${it.name}")
+                findByName(it.name)?.apply {
+                    println("add sourceSet path = $outputDir")
+                    java.srcDir(outputDir)
+                    kotlin.srcDir(outputDir)
+                }
+            }
+            project.afterEvaluate {
+                buildTask(nativeOriginPath, it, project,android)
             }
         }
     }
-
-
-    private fun attach2App(android: AppExtension, target: Project) {
-        val nativeOriginPath = getNativeFile(target)
-        copyNativeCode(nativeOriginPath, android, target)
-        target.afterEvaluate {
-            android.applicationVariants.all {
-                buildTask(nativeOriginPath, this, target)
-            }
-        }
-    }
-
 
     /**
      * copy Native code
@@ -121,7 +118,7 @@ class OrcaPlugin : Plugin<Project> {
     /**
      * build task
      */
-    private fun buildTask(nativeOriginPath: Any?, variant: BaseVariant, project: Project) {
+    private fun buildTask(nativeOriginPath: Any?, variant: Variant, project: Project,android: TestedExtension) {
         val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
         val go = (project.extensions.findByName("Orca") as Orca).go
         if (localSignature.isEmpty()) {
@@ -131,38 +128,30 @@ class OrcaPlugin : Plugin<Project> {
         val task = project.tasks.create(
             "generate${StringUtils.substring(variant.name)}SoHeader",
             GenerateOccSoHeaderTask::class.java
-        )
-        if (go.secretKey.isNotEmpty()) {
-            task.secretKey = go.secretKey
+        ) {
+            if (go.secretKey.isNotEmpty()) {
+                this.secretKey = go.secretKey
+            }
+            this.keys = go.keys
+            this.debug = go.isDebug
+            this.header = project.name
+            this.signature = localSignature
+            this.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)
+            this.inputFileDirPath = File("$cmakeListsDir/src/main/cpp/include").path
+            this.nativeOriginPath = nativeOriginPath
         }
-        task.keys = go.keys
-        task.debug = go.isDebug
-        task.header = project.name
-        task.signature = localSignature
-        task.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)
-        task.inputFileDirPath = File("$cmakeListsDir/src/main/cpp/include").path
-        task.nativeOriginPath = nativeOriginPath
 
-        val configTask = project.tasks.filter{
-            it.name.startsWith("configureCMake${StringUtils.substring(variant.name)}")
+        val variantName = StringUtils.substring(variant.name)
+
+        val configTask = project.tasks.filter {
+            it.name.startsWith("configureCMake${variantName}")
         }
         println("configureCMake $configTask")
         configTask.forEach {
-                it.dependsOn(task)
-            }
+            it.dependsOn(task)
+        }
 
         val outputDir = File(project.buildDir, "/generated/source/orca/${variant.name}")
-        val generateJavaClientTask = project.tasks.create(
-            "generate${StringUtils.substring(variant.name)}JavaClient",
-            GenerateJavaClientFileTask::class.java
-        )
-
-        generateJavaClientTask.keys = go.keys.toMutableList()
-        generateJavaClientTask.soHeadName = project.name
-        generateJavaClientTask.outputDir = outputDir
-        generateJavaClientTask.buildWithKotlin = go.isBuildKotlin
-        variant.registerJavaGeneratingTask(generateJavaClientTask, outputDir)
-
 
         val mode = go.encryptMode.toUpperCase(Locale.ENGLISH)
         val path = when (mode) {
@@ -177,18 +166,32 @@ class OrcaPlugin : Plugin<Project> {
             }
         }
 
-        val copyAESEncryptionTask = project.tasks.create(
-            "copyJavaCode${StringUtils.substring(variant.name)}",
+        val copyAESEncryptionTask = project.tasks.register(
+            "copy${variantName}EncryptionJavaCode",
             Copy::class.java
         ) {
             from(nativeOriginPath)
             include("src/main/java/com/occ/encrypt/${path}/**")
             into(outputDir)
         }
+
+
+        val generateJavaClientTask = project.tasks.register(
+            "generate${variantName}JavaClient",
+            GenerateJavaClientFileTask::class.java
+        ){
+            this.keys = go.keys.toMutableList()
+            this.soHeadName = project.name
+            this.outputDir = outputDir
+            this.buildWithKotlin = go.isBuildKotlin
+        }
+
         generateJavaClientTask.dependsOn(copyAESEncryptionTask)
 
-
+        val generateSourceTask = project.tasks.findByName("generate${variantName}Resources")
+        generateSourceTask?.dependsOn(generateJavaClientTask)
     }
+
 
     /**
      * find C++ root

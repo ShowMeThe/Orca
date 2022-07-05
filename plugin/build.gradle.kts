@@ -11,6 +11,7 @@ buildscript {
         classpath("com.novoda:bintray-release:0.9.2")
 
     }
+
 }
 
 
@@ -77,6 +78,11 @@ gradlePlugin {
     }
 }
 
+kotlin{
+    kotlinDslPluginOptions{
+        jvmTarget.set("11")
+    }
+}
 
 afterEvaluate {
     publishing{
