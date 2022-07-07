@@ -1,11 +1,9 @@
 package com.occ.orca.task
 
+
 import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
-import com.squareup.javapoet.CodeBlock
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.TypeSpec
+import com.squareup.javapoet.*
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -17,6 +15,7 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import java.util.*
 import javax.lang.model.element.Modifier
 
 open class GenerateJavaClientFileTask : DefaultTask() {
@@ -42,8 +41,15 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
     }
 
+    private fun getCoreClassName():String{
+        val base = "Core"
+        val headName = StringUtils.substring(soHeadName.toLowerCase(Locale.getDefault()))
+        return headName + base
+    }
+
     private fun buildKotlin() {
-        val classes = com.squareup.kotlinpoet.TypeSpec.objectBuilder("CoreClient")
+        val classes = com.squareup.kotlinpoet.TypeSpec.objectBuilder(getCoreClassName())
+            .addAnnotation(ClassName.get("androidx.annotation","Keep").javaClass)
             .addInitializerBlock(
                 com.squareup.kotlinpoet.CodeBlock.builder()
                     .addStatement("System.loadLibrary(%S)", "${soHeadName}-core-client")
@@ -79,14 +85,15 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
 
 
-        val file = FileSpec.builder("com.orcc.${soHeadName}.core", "CoreClient")
+        val file = FileSpec.builder("com.occ.${soHeadName}.core", getCoreClassName())
             .addType(classes.build())
             .build()
         file.writeTo(outputDir)
     }
 
     private fun buildJava() {
-        val classBuilder = TypeSpec.classBuilder("CoreClient")
+        val classBuilder = TypeSpec.classBuilder(getCoreClassName())
+            .addAnnotation(ClassName.get("androidx.annotation","Keep"))
             .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
             .addMethod(
                 MethodSpec.constructorBuilder()
@@ -130,7 +137,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
 
 
-        JavaFile.builder("com.orcc.${soHeadName}.core", classBuilder.build()).build()
+        JavaFile.builder("com.occ.${soHeadName}.core", classBuilder.build()).build()
             .writeTo(outputDir)
     }
 

@@ -46,19 +46,24 @@ class OrcaPlugin : Plugin<Project> {
     private fun attach(android: TestedExtension, project: Project) {
         val nativeOriginPath = getNativeFile(project)
         copyNativeCode(nativeOriginPath, android, project)
-        project.extensions.getByType(AndroidComponentsExtension::class.java).onVariants {
-            android.sourceSets{
-                val outputDir = File(project.buildDir, "/generated/source/orca/${it.name}")
-                findByName(it.name)?.apply {
-                    println("add sourceSet path = $outputDir")
-                    java.srcDir(outputDir)
-                    kotlin.srcDir(outputDir)
+        project.extensions.getByType(AndroidComponentsExtension::class.java)
+            .apply {
+                beforeVariants {
+                    android.sourceSets{
+                        val outputDir = File(project.buildDir, "/generated/source/orca/${it.name}")
+                        findByName(it.name)?.apply {
+                            println("add sourceSet path = $outputDir")
+                            java.srcDir(outputDir)
+                            kotlin.srcDir(outputDir)
+                        }
+                    }
+                }
+                onVariants {
+                    project.afterEvaluate {
+                        buildTask(nativeOriginPath, it, project,android)
+                    }
                 }
             }
-            project.afterEvaluate {
-                buildTask(nativeOriginPath, it, project,android)
-            }
-        }
     }
 
     /**
