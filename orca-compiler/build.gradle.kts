@@ -17,6 +17,7 @@ kotlin{
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
+    id("maven-publish")
 }
 
 repositories {
@@ -40,6 +41,19 @@ gradlePlugin {
         create("Orca-compiler") {
             id = "Orca-compiler"
             implementationClass = "com.orcc.compiler.CompilerPlugin"
+        }
+    }
+}
+
+afterEvaluate {
+    publishing{
+        publications {
+            create("release",MavenPublication::class.java){
+                from(components.getAt("java"))
+                groupId = "com.occ.orca"
+                artifactId = "orca-compiler"
+                version = "1.0.0"
+            }
         }
     }
 }
