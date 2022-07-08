@@ -47,9 +47,11 @@ abstract class ClassVisitorFactory : AsmClassVisitorFactory<InstrumentationParam
 
 class CoreClassNode(private val nextVisitor: ClassVisitor) : ClassNode(Opcodes.ASM9) {
 
-    private var hasAnnotation = false
-    private val staticField = arrayListOf<FieldVisitor>()
-    private val notStaticField = arrayListOf<FieldVisitor>()
+    private val defaultState =  0x0000
+    private var state = defaultState
+    private val hasAnnotation = 0x0002
+    private val hasStatic = 0x0004
+    private val hasNoStatic = 0x0008
 
     override fun visitField(
         access: Int,
@@ -58,8 +60,7 @@ class CoreClassNode(private val nextVisitor: ClassVisitor) : ClassNode(Opcodes.A
         signature: String?,
         value: Any?
     ): FieldVisitor {
-        val oldVisitor = super.visitField(access, name, descriptor, signature, value) as FieldNode
-        return oldVisitor
+        return super.visitField(access, name, descriptor, signature, value) as FieldNode
     }
 
     override fun visitMethod(
@@ -76,25 +77,30 @@ class CoreClassNode(private val nextVisitor: ClassVisitor) : ClassNode(Opcodes.A
                             "CoreDecryption",
                             true
                         )){
-                        hasAnnotation = true
-                        if (it.access and Opcodes.ACC_STATIC == Opcodes.ACC_STATIC) {
-                            staticField.add(it)
+                        state = state or hasAnnotation
+                        state = if (it.access and Opcodes.ACC_STATIC == Opcodes.ACC_STATIC) {
+                            state or hasStatic
                         }else{
-                            notStaticField.add(it)
+                            state or hasNoStatic
                         }
                     }
                 }
             }
         }
-        println("method == name:${name} descriptor = :${descriptor}")
         val oldMethodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions)
+
         val addInOnCreate = name.equals("onCreate")
-        val addInInit = name.equals("<init>") && notStaticField.isNotEmpty()
-        val addCinInit = name.equals("<clinit>") && staticField.isNotEmpty()
+        val hasAnnotation = state and hasAnnotation == hasAnnotation
+        val hasStatic = state and hasStatic == hasStatic
+        val hasNoStatic = state and hasNoStatic == hasNoStatic
+
+        val inCinit = name.equals("<clinit>")
+        val addInInit = name.equals("<init>") && hasAnnotation && hasNoStatic
+        val addCinInit = inCinit && hasStatic
         val methodFind = hasAnnotation && (addInOnCreate || addInInit || addCinInit)
         val writeEnd = (addInInit || addCinInit) && addInOnCreate.not()
+
         if (methodFind) {
-            val inCinit = name.equals("<clinit>")
             val newMethodVisitor =
                 object : AdviceAdapter(Opcodes.ASM9, oldMethodVisitor, access, name, descriptor) {
                     override fun onMethodEnter() {

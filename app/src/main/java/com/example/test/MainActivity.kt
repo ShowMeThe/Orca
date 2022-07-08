@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.testlibrary.Test
 import com.occ.annotation.CoreDecryption
 import com.occ.annotation.CoreInject
+import com.occ.app.core.AppCore
 
 @Keep
 class MainActivity : AppCompatActivity() {
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
         val tv = findViewById<TextView>(R.id.tv)
         tv.setOnClickListener {
-            Log.e("222222","data = ${viewModel.getValue()}  data3 = ${Test.data}")
+            Log.e("222222","data = ${viewModel.getValue()} data2 = ${AppCore.getBase()}  data3 = ${Test.data}")
         }
 
 

@@ -28,6 +28,9 @@ android {
             "data"{
                 value "88895565"
             }
+            "base"{
+                value "222222"
+            }
         }
     }
 
