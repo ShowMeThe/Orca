@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("Orca")
+    id("Orca-compiler")
     id("org.jetbrains.kotlin.android")
 }
 
@@ -22,6 +23,10 @@ android {
         storeSetDslBlock{
             "data" to "123"
         }
+    }
+
+    WhiteList{
+        add("com.example")
     }
 
     buildTypes {
@@ -50,4 +55,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+
+    implementation(project(":orca-annotation"))
 }
