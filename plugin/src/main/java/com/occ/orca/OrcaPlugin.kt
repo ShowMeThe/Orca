@@ -76,13 +76,11 @@ class OrcaPlugin : Plugin<Project> {
     ) {
         println("copyNativeCode  $nativeOriginPath")
         val file = File(project.buildDir, "orca.so")
-        if (!file.exists()) {
-            file.mkdirs()
-            project.copy {
-                from(nativeOriginPath)
-                include("src/main/cpp/**")
-                into(file)
-            }
+        file.mkdirs()
+        project.copy {
+            from(nativeOriginPath)
+            include("src/main/cpp/**")
+            into(file)
         }
 
         GenerateCMakeLists(project).apply {
