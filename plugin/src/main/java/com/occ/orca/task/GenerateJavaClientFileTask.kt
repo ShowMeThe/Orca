@@ -49,7 +49,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
 
     private fun buildKotlin() {
         val classes = com.squareup.kotlinpoet.TypeSpec.objectBuilder(getCoreClassName())
-            .addAnnotation(ClassName.get("androidx.annotation","Keep").javaClass)
+            .addAnnotation(com.squareup.kotlinpoet.ClassName("androidx.annotation","Keep"))
             .addInitializerBlock(
                 com.squareup.kotlinpoet.CodeBlock.builder()
                     .addStatement("System.loadLibrary(%S)", "${soHeadName}-core-client")
