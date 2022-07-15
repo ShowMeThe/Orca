@@ -61,6 +61,33 @@ plugins {
 
 ```
 
+Using Orca-compile:
+```gradle
+:app or :library
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'Orca'
+    id 'Orca-compiler'
+}
+
+dependencies{
+    implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
+}
+```
+
+and setting project.root build.gradle
+```gradle
+buildscript{
+       dependencies {
+        classpath("com.github.ShowMeThe.Orca:plugin:2.3.0")
+        classpath("com.github.ShowMeThe.Orca:orca-compiler:2.3.0")
+    }
+}
+
+```
+
 #### Configuration
 
 In your app or library module build.gradle, add the follow-like configs to save key-values.
