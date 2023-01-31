@@ -87,6 +87,23 @@ buildscript{
 }
 
 ```
+using Compiler example
+```gradle
+object XXXClass{
+ 
+  @CoreDecryption("data") // The key name
+  var data = ""
+
+}
+```
+also you can add this in build.gradle
+```gradle
+android {
+WhiteList{
+        add("#####") // To make it faster to build your project，you can add some specific classname where you need the @CoreDecryption
+    }
+}
+```
 
 #### Configuration
 
