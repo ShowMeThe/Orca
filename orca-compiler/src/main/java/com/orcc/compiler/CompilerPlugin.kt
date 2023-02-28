@@ -4,50 +4,57 @@ import com.android.build.api.instrumentation.*
 import com.android.build.api.variant.AndroidComponentsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.objectweb.asm.*
 import org.objectweb.asm.commons.AdviceAdapter
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 
 
-var projectName = "app"
-var goCompiler: GoCompiler? = null
-
 class CompilerPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        goCompiler =  GoCompiler(project)
-        project.extensions.add("WhiteList", requireNotNull(goCompiler))
 
         project.extensions.getByType(AndroidComponentsExtension::class.java).apply {
             this.onVariants { variant ->
-                projectName = project.name
                 variant.instrumentation.transformClassesWith(
                     ClassVisitorFactory::class.java,
                     InstrumentationScope.PROJECT
-                ) {}
+                ) {
+                    it.projectName.set(project.name)
+                }
+
                 variant.instrumentation.setAsmFramesComputationMode(FramesComputationMode.COPY_FRAMES)
             }
         }
     }
 }
 
-abstract class ClassVisitorFactory : AsmClassVisitorFactory<InstrumentationParameters.None> {
+interface InstrumentationImp : InstrumentationParameters {
+
+    @get:Input
+    val projectName: Property<String>
+
+}
+
+abstract class ClassVisitorFactory : AsmClassVisitorFactory<InstrumentationImp> {
     override fun createClassVisitor(
         classContext: ClassContext,
         nextClassVisitor: ClassVisitor
     ): ClassVisitor {
-        return CoreClassNode(nextClassVisitor)
+        return CoreClassNode(nextClassVisitor,parameters.get().projectName.get())
     }
 
     override fun isInstrumentable(classData: ClassData): Boolean {
-        return requireNotNull(goCompiler).includes.any { classData.className.contains(it) }
+        return true
     }
 }
 
 
-class CoreClassNode(private val nextVisitor: ClassVisitor) : ClassNode(Opcodes.ASM9) {
+class CoreClassNode(private val nextVisitor: ClassVisitor, private val projectName: String) :
+    ClassNode(Opcodes.ASM9) {
 
-    private val defaultState =  0x0000
+    private val defaultState = 0x0000
     private var state = defaultState
     private val hasAnnotation = 0x0002
     private val hasStatic = 0x0004
@@ -71,16 +78,17 @@ class CoreClassNode(private val nextVisitor: ClassVisitor) : ClassNode(Opcodes.A
         exceptions: Array<out String>?
     ): MethodVisitor {
         fields.forEach {
-            if(it.visibleAnnotations.isNullOrEmpty().not()){
+            if (it.visibleAnnotations.isNullOrEmpty().not()) {
                 it.visibleAnnotations.forEach { annotationNode ->
-                    if(annotationNode.desc.contains(
+                    if (annotationNode.desc.contains(
                             "CoreDecryption",
                             true
-                        )){
+                        )
+                    ) {
                         state = state or hasAnnotation
                         state = if (it.access and Opcodes.ACC_STATIC == Opcodes.ACC_STATIC) {
                             state or hasStatic
-                        }else{
+                        } else {
                             state or hasNoStatic
                         }
                     }
@@ -132,10 +140,14 @@ class CoreClassNode(private val nextVisitor: ClassVisitor) : ClassNode(Opcodes.A
                             "(Ljava/lang/String;)Lcom/occ/annotation/CoreInject;",
                             false
                         )
-                        if(inCinit){
-                            println("class name = $name")
-                            mv.visitFieldInsn(GETSTATIC, this@CoreClassNode.name, "INSTANCE", "L${this@CoreClassNode.name};")
-                        }else{
+                        if (inCinit) {
+                            mv.visitFieldInsn(
+                                GETSTATIC,
+                                this@CoreClassNode.name,
+                                "INSTANCE",
+                                "L${this@CoreClassNode.name};"
+                            )
+                        } else {
                             mv.visitVarInsn(ALOAD, 0)
                         }
                         mv.visitMethodInsn(

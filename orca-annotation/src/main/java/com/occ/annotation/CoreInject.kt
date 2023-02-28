@@ -7,6 +7,7 @@ class CoreInject private constructor(private val projectName: String) {
 
     companion object {
         private val instants = ArrayMap<String, CoreInject>()
+
         @JvmStatic
         fun getInstant(projectName: String): CoreInject {
             val core = instants[projectName] ?: CoreInject(projectName).also {
@@ -26,15 +27,25 @@ class CoreInject private constructor(private val projectName: String) {
 
     private val methods by lazy { coreClazz.declaredMethods }
 
+    private val coreInstant by lazy {
+      kotlin.runCatching {
+            coreClazz.getDeclaredField("INSTANCE").let {
+                it.isAccessible = true
+                it.get(coreClazz)
+            }
+        }.getOrDefault(coreClazz)
+    }
+
     fun inject(any: Any) {
         any::class.java.declaredFields.forEach {
             if (it.isAnnotationPresent(CoreDecryption::class.java) && it.type == String::class.java) {
                 kotlin.runCatching {
                     it.isAccessible = true
-                    val annotationClazz = requireNotNull(it.getAnnotation(CoreDecryption::class.java))
+                    val annotationClazz =
+                        requireNotNull(it.getAnnotation(CoreDecryption::class.java))
                     val methodName = "get${annotationClazz.keyName.getMethodName()}"
                     val method = methods.singleOrNull { mt -> mt.name.equals(methodName) }
-                    val value = requireNotNull(method).invoke(coreClazz)
+                    val value = requireNotNull(method).invoke(coreInstant)
                     it.set(any, value)
                 }.onFailure { ex ->
                     ex.printStackTrace()

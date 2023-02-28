@@ -19,13 +19,20 @@ class MainActivity : AppCompatActivity() {
             .get(AndroidViewModel::class.java)
     }
 
+    @CoreDecryption("data")
+    private var data = ""
+
+    @CoreDecryption("base")
+    private var data2 = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val tv = findViewById<TextView>(R.id.tv)
         tv.setOnClickListener {
-            Log.e("222222","data = ${viewModel.getValue()} data2 = ${AppCore.getBase()}  data3 = ${Test.data}")
+            Log.e("222222","value1 = $data value2 = ${data2}")
+            Log.e("222222","value1 = ${viewModel.getValue()}  value2 = ${viewModel.getValue2()}  data2 = ${AppCore.getBase()}  data3 = ${Test.data}")
         }
 
 

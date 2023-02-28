@@ -34,9 +34,7 @@ android {
         }
     }
 
-    WhiteList{
-        add("com.example")
-    }
+
 
     buildTypes {
         release {
@@ -63,4 +61,5 @@ dependencies {
 
     implementation project(":test_library")
     implementation project(":orca-annotation")
+    //implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
 }

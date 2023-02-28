@@ -25,9 +25,6 @@ android {
         }
     }
 
-    WhiteList{
-        add("com.example")
-    }
 
     buildTypes {
         release {
@@ -57,4 +54,5 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
     implementation(project(":orca-annotation"))
+    //implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
 }
