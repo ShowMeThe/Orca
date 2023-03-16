@@ -36,7 +36,7 @@
 	}
  
   dependencies {
-        classpath "com.github.ShowMeThe:Orca:2.0.0-release13"
+        classpath "com.github.ShowMeThe.Orca:plugin:2.3.5"
     }
   
   ```
