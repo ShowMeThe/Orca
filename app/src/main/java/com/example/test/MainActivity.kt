@@ -11,6 +11,10 @@ import com.occ.annotation.CoreDecryption
 import com.occ.annotation.CoreInject
 import com.occ.app.core.AppCore
 
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+
+
 @Keep
 class MainActivity : AppCompatActivity() {
 

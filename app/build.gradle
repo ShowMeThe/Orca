@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'Orca'
     id 'kotlin-android'
     id 'Orca'
     id 'Orca-compiler'
@@ -25,15 +26,11 @@ android {
         encryptMode = "des"
         isBuildKotlin = true
         storeSet{
-            "data"{
-                value "88895565"
-            }
             "base"{
                 value "222222"
             }
         }
     }
-
 
 
     buildTypes {

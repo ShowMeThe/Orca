@@ -36,7 +36,7 @@
 	}
  
   dependencies {
-        classpath "com.github.ShowMeThe:Orca:2.0.0-release13"
+        classpath "com.github.ShowMeThe.Orca:plugin:2.3.5"
     }
   
   ```
@@ -59,6 +59,42 @@ plugins {
     id 'kotlin-android'
 }
 
+```
+
+Using Orca-compile:
+```gradle
+:app or :library
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'Orca'
+    id 'Orca-compiler'
+}
+
+dependencies{
+    implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.5")
+}
+```
+
+and setting project.root build.gradle
+```gradle
+buildscript{
+       dependencies {
+        classpath("com.github.ShowMeThe.Orca:plugin:2.3.5")
+        classpath("com.github.ShowMeThe.Orca:orca-compiler:2.3.5")
+    }
+}
+
+```
+using Compiler example
+```gradle
+object XXXClass{
+ 
+  @CoreDecryption("data") // The key name
+  var data = ""
+
+}
 ```
 
 #### Configuration
