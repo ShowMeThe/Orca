@@ -1,6 +1,6 @@
 package com.occ.orca.task
 
-import com.occ.orca.Go
+
 import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
 import com.squareup.javapoet.*
@@ -8,14 +8,14 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.PropertySpec
 import org.gradle.api.DefaultTask
-import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import java.util.*
 import javax.lang.model.element.Modifier
 
 open class GenerateJavaClientFileTask : DefaultTask() {
@@ -27,22 +27,29 @@ open class GenerateJavaClientFileTask : DefaultTask() {
     lateinit var soHeadName: String
 
     @Input
-    lateinit var keys: NamedDomainObjectContainer<KeyExt>
+    lateinit var keys: List<KeyExt>
 
     @Input
-    lateinit var go: Go
+    var buildWithKotlin : Boolean = false
 
     @TaskAction
     fun generate() {
-        if (go.isBuildKotlin) {
+        if (buildWithKotlin) {
             buildKotlin()
         } else {
             buildJava()
         }
     }
 
+    private fun getCoreClassName():String{
+        val base = "Core"
+        val headName = StringUtils.substring(soHeadName.toLowerCase(Locale.getDefault()))
+        return headName + base
+    }
+
     private fun buildKotlin() {
-        val classes = com.squareup.kotlinpoet.TypeSpec.objectBuilder("CoreClient")
+        val classes = com.squareup.kotlinpoet.TypeSpec.objectBuilder(getCoreClassName())
+            .addAnnotation(com.squareup.kotlinpoet.ClassName("androidx.annotation","Keep"))
             .addInitializerBlock(
                 com.squareup.kotlinpoet.CodeBlock.builder()
                     .addStatement("System.loadLibrary(%S)", "${soHeadName}-core-client")
@@ -78,14 +85,15 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
 
 
-        val file = FileSpec.builder("com.orcc.${soHeadName}.core", "CoreClient")
+        val file = FileSpec.builder("com.occ.${soHeadName}.core", getCoreClassName())
             .addType(classes.build())
             .build()
         file.writeTo(outputDir)
     }
 
     private fun buildJava() {
-        val classBuilder = TypeSpec.classBuilder("CoreClient")
+        val classBuilder = TypeSpec.classBuilder(getCoreClassName())
+            .addAnnotation(ClassName.get("androidx.annotation","Keep"))
             .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
             .addMethod(
                 MethodSpec.constructorBuilder()
@@ -129,7 +137,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
 
 
-        JavaFile.builder("com.orcc.${soHeadName}.core", classBuilder.build()).build()
+        JavaFile.builder("com.occ.${soHeadName}.core", classBuilder.build()).build()
             .writeTo(outputDir)
     }
 

@@ -16,10 +16,11 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:4.1.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${rootProject.extra["kotlin_version"]}")
+        classpath("com.android.tools.build:gradle:7.2.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
         classpath("org.jetbrains.kotlin:kotlin-android-extensions:${rootProject.extra["kotlin_version"]}")
-        //classpath("com.github.ShowMeThe.Orca:orca:2.0.0-alpha15")
+        classpath("com.github.ShowMeThe.Orca:plugin:2.3.0")
+        classpath("com.github.ShowMeThe.Orca:orca-compiler:2.3.0")
     }
 
 }

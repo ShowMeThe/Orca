@@ -43,11 +43,17 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
 
-    string clazzName("com/orcc/");
+    string clazzName("com/occ/");
     clazzName.append(HEADER);
-    clazzName.append("/core/CoreClient");
+    char chars[] = HEADER;
+    char first = chars[0];
+    if(first >= 'a' && first<= 'z'){
+        chars[0] -= 32;
+    }
+    string newName = string(chars);
+    clazzName.append("/core/" + newName + "Core");
+    LOG("%s",clazzName.data());
     jclass clazz = env->FindClass(clazzName.data());
-
     env->RegisterNatives(clazz, methods, sizeof(methods)/sizeof(JNINativeMethod));
 
     LOAD_MAP(local_map);

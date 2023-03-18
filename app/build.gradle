@@ -2,11 +2,13 @@ plugins {
     id 'com.android.application'
     id 'Orca'
     id 'kotlin-android'
+    id 'Orca'
+    id 'Orca-compiler'
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.1"
+    compileSdkVersion 31
+    buildToolsVersion "31.0.0"
 
     defaultConfig {
         applicationId "com.orcinus.orca"
@@ -22,10 +24,10 @@ android {
     Orca.go{
         isDebug = true
         encryptMode = "des"
-        isBuildKotlin = false
+        isBuildKotlin = true
         storeSet{
-            "data"{
-                value "88895565"
+            "base"{
+                value "222222"
             }
         }
     }
@@ -38,8 +40,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 }
 
@@ -53,4 +55,8 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    implementation project(":test_library")
+    //implementation project(":orca-annotation")
+    implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
 }
