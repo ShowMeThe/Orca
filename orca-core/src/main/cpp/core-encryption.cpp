@@ -21,6 +21,7 @@ const char *encryption::decrypt(const char *key, const char *data) {
     if (value != NULL) {
         return value;
     }
+
     string head_name = HEADER;
     string class_path = "com/occ/" + head_name + "/AESEncryption";
     string mode = MODE;

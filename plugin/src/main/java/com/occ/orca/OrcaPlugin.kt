@@ -50,7 +50,7 @@ class OrcaPlugin : Plugin<Project> {
         project.extensions.getByType(AndroidComponentsExtension::class.java)
             .apply {
                 beforeVariants {
-                    android.sourceSets{
+                    android.sourceSets {
                         val outputDir = File(project.buildDir, "/generated/source/orca/${it.name}")
                         findByName(it.name)?.apply {
                             println("add sourceSet path = $outputDir")
@@ -61,7 +61,7 @@ class OrcaPlugin : Plugin<Project> {
                 }
                 onVariants {
                     project.afterEvaluate {
-                        buildTask(nativeOriginPath, it, project,android)
+                        buildTask(nativeOriginPath, it, project, android)
                     }
                 }
             }
@@ -122,7 +122,12 @@ class OrcaPlugin : Plugin<Project> {
     /**
      * build task
      */
-    private fun buildTask(nativeOriginPath: Any?, variant: Variant, project: Project,android: TestedExtension) {
+    private fun buildTask(
+        nativeOriginPath: Any?,
+        variant: Variant,
+        project: Project,
+        android: TestedExtension
+    ) {
         val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
         val go = (project.extensions.findByName("Orca") as Orca).go
         if (localSignature.isEmpty()) {
@@ -155,7 +160,7 @@ class OrcaPlugin : Plugin<Project> {
             it.dependsOn(task)
         }
 
-        val outputDir = File(project.buildDir, "/generated/source/orca/${variant.name}")
+        val outputDir = File(project.buildDir, "/generated/source/orca/${variant.name}/")
 
         val mode = go.encryptMode.toUpperCase(Locale.ENGLISH)
         val path = when (mode) {
@@ -170,13 +175,17 @@ class OrcaPlugin : Plugin<Project> {
             }
         }
 
+        val includePath = "${path}/**"
+        val copyOutFilePath = outputDir.path +
+                "/com/occ/${project.name.toLowerCase(Locale.getDefault())}"
+
         val copyAESEncryptionTask = project.tasks.register(
             "copy${variantName}EncryptionJavaCode",
             Copy::class.java
         ) {
-            from(nativeOriginPath)
-            include("src/main/java/com/occ/encrypt/${path}/**")
-            into(outputDir)
+            from(nativeOriginPath.toString() + "/src/main/java/com/occ/encrypt/")
+            include(includePath)
+            into(copyOutFilePath)
         }
 
         val rewriteEncryptionTask = project.tasks.register(
@@ -190,7 +199,7 @@ class OrcaPlugin : Plugin<Project> {
         val generateJavaClientTask = project.tasks.register(
             "generate${variantName}JavaClient",
             GenerateJavaClientFileTask::class.java
-        ){
+        ) {
             this.keys = go.keys.toMutableList()
             this.soHeadName = project.name
             this.outputDir = outputDir
