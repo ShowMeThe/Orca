@@ -8,9 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.testlibrary.Test
 import com.occ.annotation.CoreDecryption
-import com.occ.annotation.CoreInject
 import com.occ.app.core.AppCore
-
 
 
 @Keep

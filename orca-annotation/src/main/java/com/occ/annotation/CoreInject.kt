@@ -31,9 +31,9 @@ class CoreInject private constructor(private val projectName: String) {
       kotlin.runCatching {
           coreClazz.declaredFields.first{ it. name == "INSTANCE"}
               .let {
-                it.isAccessible = true
-                it.get(coreClazz)
-            }
+                  it.isAccessible = true
+                  it.get(coreClazz)
+              }
         }.getOrDefault(coreClazz)
     }
 

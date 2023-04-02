@@ -192,7 +192,7 @@ class OrcaPlugin : Plugin<Project> {
             "rewriteEncryption${variantName}Task",
             GenerateRewriteJavaTask::class.java
         ) {
-            dirFile = File(copyOutFilePath, path)
+            dirFile = File(outputDir, "src/main/java/com/occ/encrypt/${path}")
             soHeaderName = project.name
         }
 
