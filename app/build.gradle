@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'Orca'
     id 'kotlin-android'
-    id 'Orca'
     id 'Orca-compiler'
 }
 
@@ -57,6 +56,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation project(":test_library")
-    //implementation project(":orca-annotation")
-    implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
+    implementation project(":orca-annotation")
+   // implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
 }

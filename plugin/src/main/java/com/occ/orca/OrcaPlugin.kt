@@ -8,6 +8,7 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.occ.orca.task.GenerateCMakeLists
 import com.occ.orca.task.GenerateJavaClientFileTask
 import com.occ.orca.task.GenerateOccSoHeaderTask
+import com.occ.orca.task.GenerateRewriteJavaTask
 import javassist.ClassPool
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
@@ -147,7 +148,7 @@ class OrcaPlugin : Plugin<Project> {
         val variantName = StringUtils.substring(variant.name)
 
         val configTask = project.tasks.filter {
-            it.name.startsWith("configureCMake${variantName}")
+            it.name.startsWith("configureCMake")
         }
         println("configureCMake $configTask")
         configTask.forEach {
@@ -178,6 +179,13 @@ class OrcaPlugin : Plugin<Project> {
             into(outputDir)
         }
 
+        val rewriteEncryptionTask = project.tasks.register(
+            "rewriteEncryption${variantName}Task",
+            GenerateRewriteJavaTask::class.java
+        ) {
+            dirFile = File(outputDir, "src/main/java/com/occ/encrypt/${path}")
+            soHeaderName = project.name
+        }
 
         val generateJavaClientTask = project.tasks.register(
             "generate${variantName}JavaClient",
@@ -189,7 +197,8 @@ class OrcaPlugin : Plugin<Project> {
             this.buildWithKotlin = go.isBuildKotlin
         }
 
-        generateJavaClientTask.dependsOn(copyAESEncryptionTask)
+        rewriteEncryptionTask.dependsOn(copyAESEncryptionTask)
+        generateJavaClientTask.dependsOn(rewriteEncryptionTask)
 
         val generateSourceTask = project.tasks.findByName("generate${variantName}Resources")
         generateSourceTask?.dependsOn(generateJavaClientTask)

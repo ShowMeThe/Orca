@@ -29,10 +29,11 @@ class CoreInject private constructor(private val projectName: String) {
 
     private val coreInstant by lazy {
       kotlin.runCatching {
-            coreClazz.getDeclaredField("INSTANCE").let {
-                it.isAccessible = true
-                it.get(coreClazz)
-            }
+          coreClazz.declaredFields.first{ it. name == "INSTANCE"}
+              .let {
+                  it.isAccessible = true
+                  it.get(coreClazz)
+              }
         }.getOrDefault(coreClazz)
     }
 

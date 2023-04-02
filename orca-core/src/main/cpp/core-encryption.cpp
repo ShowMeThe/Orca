@@ -5,6 +5,7 @@
 #include "include/core_util.h"
 #include "include/core-encryption.h"
 #include "include/core-client.h"
+
 using namespace std;
 
 map<jstring, char *> uKyMap;
@@ -17,15 +18,16 @@ encryption::encryption(JNIEnv *jniEnv, jobject context) {
 const char *encryption::decrypt(const char *key, const char *data) {
     jstring cipherString = jniEnv->NewStringUTF(data);
     char *value = uKyMap[cipherString];
-    if(value != NULL){
+    if (value != NULL) {
         return value;
     }
-    string class_path = "com/occ/encrypt/AESEncryption";
+    string head_name = HEADER;
+    string class_path = "com/occ/" + head_name + "/AESEncryption";
     string mode = MODE;
-    if(mode == "AES"){
-        class_path = "com/occ/encrypt/aes/AESEncryption";
-    }else if(mode == "DES"){
-        class_path = "com/occ/encrypt/des/DESEncryption";
+    if (mode == "AES") {
+        class_path = "com/occ/" + head_name + "/aes/AESEncryption";
+    } else if (mode == "DES") {
+        class_path = "com/occ/" + head_name + "/des/DESEncryption";
     }
     jclass encrypt_clz = jniEnv->FindClass(class_path.data());
     if (encrypt_clz != NULL) {
