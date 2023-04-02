@@ -9,11 +9,11 @@ buildscript {
 
 }
 
-
 repositories {
     google()
     mavenCentral()
 }
+
 
 plugins {
     `kotlin-dsl`
@@ -57,7 +57,7 @@ tasks.getByName("jar").finalizedBy("zipNative")
 dependencies {
     compileOnly(gradleApi())
     //implementation("androidx.annotation:annotation:1.3.0")
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
     compileOnly("com.android.tools.build:gradle:7.2.0")
     implementation("com.squareup:javapoet:1.13.0")
     implementation("com.squareup:kotlinpoet:1.9.0")

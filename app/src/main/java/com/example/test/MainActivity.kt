@@ -11,8 +11,6 @@ import com.occ.annotation.CoreDecryption
 import com.occ.annotation.CoreInject
 import com.occ.app.core.AppCore
 
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 
 
 @Keep
@@ -23,9 +21,6 @@ class MainActivity : AppCompatActivity() {
             .get(AndroidViewModel::class.java)
     }
 
-    @CoreDecryption("data")
-    private var data = ""
-
     @CoreDecryption("base")
     private var data2 = ""
 
@@ -35,8 +30,8 @@ class MainActivity : AppCompatActivity() {
 
         val tv = findViewById<TextView>(R.id.tv)
         tv.setOnClickListener {
-            Log.e("222222","value1 = $data value2 = ${data2}")
-            Log.e("222222","value1 = ${viewModel.getValue()}  value2 = ${viewModel.getValue2()}  data2 = ${AppCore.getBase()}  data3 = ${Test.data}")
+            Log.e("222222","value2 = ${data2}")
+            Log.e("222222","value2 = ${viewModel.getValue2()}  data2 = ${AppCore.getBase()}  data3 = ${Test.data}")
         }
 
 

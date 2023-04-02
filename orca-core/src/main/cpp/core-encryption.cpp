@@ -20,12 +20,13 @@ const char *encryption::decrypt(const char *key, const char *data) {
     if(value != NULL){
         return value;
     }
-    string class_path = "com/occ/encrypt/AESEncryption";
+    string header = HEADER;
+    string class_path = "com/occ/" + header + "/AESEncryption";
     string mode = MODE;
     if(mode == "AES"){
-        class_path = "com/occ/encrypt/aes/AESEncryption";
+        class_path = "com/occ/" + header + "/aes/AESEncryption";
     }else if(mode == "DES"){
-        class_path = "com/occ/encrypt/des/DESEncryption";
+        class_path = "com/occ/" + header + "/des/DESEncryption";
     }
     jclass encrypt_clz = jniEnv->FindClass(class_path.data());
     if (encrypt_clz != NULL) {
