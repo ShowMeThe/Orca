@@ -175,17 +175,15 @@ class OrcaPlugin : Plugin<Project> {
             }
         }
 
-        val includePath = "${path}/**"
-        val copyOutFilePath = outputDir.path +
-                "/com/occ/${project.name.toLowerCase(Locale.getDefault())}"
+        val includePath = "src/main/java/com/occ/encrypt/${path}/**"
 
         val copyAESEncryptionTask = project.tasks.register(
             "copy${variantName}EncryptionJavaCode",
             Copy::class.java
         ) {
-            from(nativeOriginPath.toString() + "/src/main/java/com/occ/encrypt/")
+            from(nativeOriginPath)
             include(includePath)
-            into(copyOutFilePath)
+            into(outputDir)
         }
 
         val rewriteEncryptionTask = project.tasks.register(
