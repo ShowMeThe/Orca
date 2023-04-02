@@ -23,7 +23,7 @@ android {
     Orca.go{
         isDebug = true
         encryptMode = "des"
-        isBuildKotlin = true
+        isBuildKotlin = false
         storeSet{
             "base"{
                 value "222222"
