@@ -36,7 +36,7 @@
 	}
  
   dependencies {
-        classpath "com.github.ShowMeThe.Orca:plugin:2.3.5"
+        classpath "com.github.ShowMeThe.Orca:plugin:2.3.6"
     }
   
   ```
@@ -81,8 +81,8 @@ and setting project.root build.gradle
 ```gradle
 buildscript{
        dependencies {
-        classpath("com.github.ShowMeThe.Orca:plugin:2.3.5")
-        classpath("com.github.ShowMeThe.Orca:orca-compiler:2.3.5")
+        classpath("com.github.ShowMeThe.Orca:plugin:2.3.6")
+        classpath("com.github.ShowMeThe.Orca:orca-compiler:2.3.6")
     }
 }
 
