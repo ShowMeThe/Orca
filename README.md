@@ -119,10 +119,12 @@ Orca.go{
 ```
 
 ### Call in your project(Java or Kotlin)
-
+The name of "XXXX" in class name "XXXXCore"  depends on what name you've set in project.
+Your projct name with first character upper case and plus 'Core' will be the final class name.
+Such as, the project name is :app and the class name will be 'AppCore'
 ```kotlin
 
-val data = CoreClient.getData()
+val data = XXXXCore.getData()
 
 
 ```
