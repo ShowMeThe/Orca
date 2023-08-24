@@ -17,7 +17,7 @@ private:
 public:
     encryption(JNIEnv *jniEnv, jobject context);
 
-    const char *decrypt(const char *key, const char *data);
+    jstring decrypt(const char *key, const char *data);
 };
 
 

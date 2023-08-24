@@ -8,20 +8,14 @@
 
 using namespace std;
 
-map<jstring, char *> uKyMap;
 
 encryption::encryption(JNIEnv *jniEnv, jobject context) {
     this->jniEnv = jniEnv;
     this->_context = context;
 }
 
-const char *encryption::decrypt(const char *key, const char *data) {
+jstring encryption::decrypt(const char *key, const char *data) {
     jstring cipherString = jniEnv->NewStringUTF(data);
-    char *value = uKyMap[cipherString];
-    if (value != NULL) {
-        return value;
-    }
-
     string head_name = HEADER;
     string class_path = "com/occ/" + head_name + "/AESEncryption";
     string mode = MODE;
@@ -36,15 +30,13 @@ const char *encryption::decrypt(const char *key, const char *data) {
                                                                 "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
         if (decrypt_method_id != NULL) {
             jstring keyString = jniEnv->NewStringUTF(key);
-            jstring result = (jstring) jniEnv->CallStaticObjectMethod(encrypt_clz,
+            auto result = (jstring) jniEnv->CallStaticObjectMethod(encrypt_clz,
                                                                       decrypt_method_id, keyString,
                                                                       cipherString);
-            char *resultChars = const_cast<char *>(jniEnv->GetStringUTFChars(result, JNI_FALSE));
+           // const char *resultChars = (jniEnv->GetStringUTFChars(result, JNI_FALSE));
             jniEnv->DeleteLocalRef(keyString);
             jniEnv->DeleteLocalRef(cipherString);
-            jniEnv->DeleteLocalRef(result);
-            uKyMap[cipherString] = resultChars;
-            return resultChars;
+            return result;
         }
     }
     return NULL;

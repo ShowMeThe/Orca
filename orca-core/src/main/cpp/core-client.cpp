@@ -23,9 +23,9 @@ JNIEXPORT jstring JNICALL getString(JNIEnv *env,jclass clazz,jstring key_){
     string keyStr(key);
     string value = local_map[keyStr];
     auto *encryption = new class encryption(env, environments->getContext());
-    const char *result = encryption->decrypt(QA, value.c_str());
+    auto result = encryption->decrypt(QA, value.c_str());
     env->ReleaseStringUTFChars(key_, key);
-    return env->NewStringUTF(result);
+    return result;
 }
 
 JNINativeMethod methods[] = {
