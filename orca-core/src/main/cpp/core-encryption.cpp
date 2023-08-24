@@ -8,7 +8,6 @@
 
 using namespace std;
 
-map<jstring, char *> uKyMap;
 
 encryption::encryption(JNIEnv *jniEnv, jobject context) {
     this->jniEnv = jniEnv;
@@ -17,10 +16,6 @@ encryption::encryption(JNIEnv *jniEnv, jobject context) {
 
 const char *encryption::decrypt(const char *key, const char *data) {
     jstring cipherString = jniEnv->NewStringUTF(data);
-    char *value = uKyMap[cipherString];
-    if (value != NULL) {
-        return value;
-    }
 
     string head_name = HEADER;
     string class_path = "com/occ/" + head_name + "/AESEncryption";
@@ -43,7 +38,6 @@ const char *encryption::decrypt(const char *key, const char *data) {
             jniEnv->DeleteLocalRef(keyString);
             jniEnv->DeleteLocalRef(cipherString);
             jniEnv->DeleteLocalRef(result);
-            uKyMap[cipherString] = resultChars;
             return resultChars;
         }
     }
