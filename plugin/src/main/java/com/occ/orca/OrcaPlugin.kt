@@ -118,6 +118,45 @@ class OrcaPlugin : Plugin<Project> {
         }
     }
 
+    /**
+     * check before build task
+     */
+    private val checkFiles by lazy {
+        arrayOf(
+            "core-client.h",
+            "core-encryption.h",
+            "core-environment.h",
+            "core_util.h",
+            "core-client.cpp",
+            "core-encryption.cpp",
+            "core-environment.cpp"
+        )
+    }
+
+    private fun checkFileExist(project: Project, nativeOriginPath: Any?) {
+        val file = File(project.buildDir, "orca.so")
+        val fileLists = file.listFiles()
+        val isFileAllExist = fileLists.isNullOrEmpty() && fileLists.checkFilesNameExist()
+        println("checkFileExist before task = $isFileAllExist")
+        if (isFileAllExist) {
+            try {
+                file.deleteRecursively()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            file.mkdirs()
+            project.copy {
+                from(nativeOriginPath)
+                include("src/main/cpp/**")
+                into(file)
+            }
+        }
+    }
+
+    private fun Array<File>?.checkFilesNameExist(): Boolean {
+        return this?.all { checkFiles.contains(it.name) } == true
+    }
+
 
     /**
      * build task
@@ -128,6 +167,8 @@ class OrcaPlugin : Plugin<Project> {
         project: Project,
         android: TestedExtension
     ) {
+        checkFileExist(project, nativeOriginPath)
+
         val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
         val go = (project.extensions.findByName("Orca") as Orca).go
         if (localSignature.isEmpty()) {
@@ -143,6 +184,7 @@ class OrcaPlugin : Plugin<Project> {
             }
             this.keys = go.keys
             this.debug = go.isDebug
+            this.cacheValue = go.cacheValue
             this.header = project.name
             this.signature = localSignature
             this.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)

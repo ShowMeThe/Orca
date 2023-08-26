@@ -38,6 +38,9 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
     @Input
     lateinit var keys: NamedDomainObjectContainer<KeyExt>
 
+    @Input
+    var cacheValue = false
+
     @TaskAction
     fun generate() {
         val inputFileDir = File(inputFileDirPath)
@@ -82,6 +85,8 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
         lines.add("#define MODE \"$encryptMode\"\n")
 
         lines.add("#define DEBUG $debug \n")
+
+        lines.add("#define CD $cacheValue \n")
 
         lines.add("#define QA \"$secretKey\"\n")
 

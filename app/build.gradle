@@ -24,9 +24,19 @@ android {
         isDebug = true
         encryptMode = "des"
         isBuildKotlin = false
+        cacheValue = true
         storeSet{
             "base"{
                 value "222222"
+            }
+            "base2"{
+                value "91239812931291"
+            }
+            "base3"{
+                value "ksajdpjfopak[pwskdopasodpapo"
+            }
+            "base4"{
+                value "htttps://wwww.google.com.hk"
             }
         }
     }
