@@ -23,9 +23,9 @@ JNIEXPORT jstring JNICALL getString(JNIEnv *env,jclass clazz,jstring key_){
     string keyStr(key);
     string value = local_map[keyStr];
     auto *encryption = new class encryption(env, environments->getContext());
-    const char *result = encryption->decrypt(QA, value.c_str());
+    jstring result = encryption->decrypt(QA, value.c_str());
     env->ReleaseStringUTFChars(key_, key);
-    return env->NewStringUTF(result);
+    return result;
 }
 
 JNINativeMethod methods[] = {
@@ -52,7 +52,6 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
     string newName = string(chars);
     clazzName.append("/core/" + newName + "Core");
-    LOG("%s",clazzName.data());
     jclass clazz = env->FindClass(clazzName.data());
     env->RegisterNatives(clazz, methods, sizeof(methods)/sizeof(JNINativeMethod));
 

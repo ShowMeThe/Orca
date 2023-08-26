@@ -23,4 +23,6 @@
 
 #define DEBUG false
 
+#define CD false
+
 #endif //ORCA_CORE_CLIENT_H
