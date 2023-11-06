@@ -51,7 +51,7 @@ task("zipNative",Zip::class){
 }
 
 
-tasks.getByName("jar").finalizedBy("zipNative")
+tasks.getByName("assemble").finalizedBy("zipNative")
 
 
 dependencies {
