@@ -25,12 +25,12 @@ plugins {
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
 
-val pVersion = "2.3.0"
+val pVersion = "2.3.9"
 
 val parentDir = project.rootDir.parentFile.path
 val orca_core = file(parentDir + File.separator + "orca-core")
-val archivesBaseName = "Orca"
-var jarFile = "build/libs/plugin-$pVersion.jar"
+val archivesBaseName = "orca-plugin"
+var jarFile = "build/libs/orca-plugin-${pVersion}.jar"
 println("orca_core path = $orca_core")
 task("zipNative",Zip::class){
     destinationDirectory.set(project.file("build/libs"))
@@ -84,12 +84,13 @@ afterEvaluate {
             create("release",MavenPublication::class.java){
                 from(components.getAt("java"))
                 groupId = "com.occ.orca"
-                artifactId = "orca"
+                artifactId = "orca-plugin"
                 version = pVersion
             }
         }
     }
 }
+
 
 /*plugins.apply("com.github.dcendents.android-maven")*/
 //group = "com.occ.orca"
