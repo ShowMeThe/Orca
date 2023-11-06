@@ -84,7 +84,7 @@ afterEvaluate {
             create("release",MavenPublication::class.java){
                 from(components.getAt("java"))
                 groupId = "com.occ.orca"
-                artifactId = "orca"
+                artifactId = "orca-core"
                 version = pVersion
             }
         }
