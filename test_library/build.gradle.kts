@@ -7,7 +7,7 @@ plugins {
 
 android {
     compileSdk = 31
-
+    namespace  "com.orcinus.library"
     defaultConfig {
         minSdk = 21
         targetSdk = 31

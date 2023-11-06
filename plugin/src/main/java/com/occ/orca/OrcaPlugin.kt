@@ -104,13 +104,6 @@ class OrcaPlugin : Plugin<Project> {
      * setUp cmake
      */
     private fun setUpCmake(cmakeListsPath: String, android: TestedExtension) {
-        android.defaultConfig {
-            externalNativeBuild {
-                cmake {
-                    cppFlags("")
-                }
-            }
-        }
         android.externalNativeBuild {
             cmake {
                 path = File(cmakeListsPath)
@@ -137,19 +130,14 @@ class OrcaPlugin : Plugin<Project> {
         val file = File(project.buildDir, "orca.so")
         val fileLists = file.listFiles()
         val isFileAllExist = fileLists.isNullOrEmpty() && fileLists.checkFilesNameExist()
-        println("checkFileExist before task = $isFileAllExist")
-        if (isFileAllExist) {
-            try {
-                file.deleteRecursively()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            file.mkdirs()
+        println("checkFileExist before task = $isFileAllExist nativeOriginPath = $nativeOriginPath")
+        if (isFileAllExist.not()) {
             project.copy {
                 from(nativeOriginPath)
                 include("src/main/cpp/**")
                 into(file)
             }
+            println("checkFileExist before task = $isFileAllExist nativeOriginPath = $nativeOriginPath")
         }
     }
 
