@@ -17,8 +17,8 @@ buildscript {
         classpath("com.android.tools.build:gradle:8.1.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${rootProject.extra["kotlin_version"]}")
         classpath("org.jetbrains.kotlin:kotlin-android-extensions:${rootProject.extra["kotlin_version"]}")
-        //classpath("com.github.ShowMeThe.Orca:plugin:2.3.6")
-        //classpath("com.github.ShowMeThe.Orca:orca-compiler:2.3.6")
+        //classpath("com.github.ShowMeThe.Orca:orca-core:2.4.0")
+        //classpath("com.github.ShowMeThe.Orca:orca-compiler:2.4.0")
 
     }
 
