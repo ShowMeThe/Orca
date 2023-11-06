@@ -29,11 +29,11 @@ val pVersion = "2.4.0"
 val parentDir = project.rootDir.parentFile.path
 val orca_core = file(parentDir + File.separator + "orca-core")
 val archivesBaseName = "orca-plugin"
-var jarFile = "build/libs/${archivesBaseName}.jar"
+var jarFile = "build/libs/${archivesBaseName}-${pVersion}.jar"
 println("orca_core path = $orca_core")
 task("zipNative",Zip::class){
     destinationDirectory.set(project.file("build/libs"))
-    archiveFileName.set("$archivesBaseName.jarx")
+    archiveFileName.set("$archivesBaseName-$pVersion.jarx")
     from(project.zipTree(jarFile))
     include("META-INF/**")
     include("com/**")
@@ -44,7 +44,7 @@ task("zipNative",Zip::class){
 
     doLast {
         val originJar = project.file(jarFile)
-        val xJar = project.file("build/libs/$archivesBaseName.jarx")
+        val xJar = project.file("build/libs/$archivesBaseName-${pVersion}.jarx")
         originJar.delete()
         xJar.renameTo(originJar)
     }
@@ -88,4 +88,4 @@ afterEvaluate {
     }
 }
 
-
+version = pVersion
