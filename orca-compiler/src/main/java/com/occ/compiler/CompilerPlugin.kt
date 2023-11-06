@@ -1,4 +1,4 @@
-package com.orcc.compiler
+package com.occ.compiler
 
 import com.android.build.api.instrumentation.*
 import com.android.build.api.variant.AndroidComponentsExtension

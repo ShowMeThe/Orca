@@ -67,8 +67,8 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        create("Orca") {
-            id = "Orca"
+        create("Orca-core") {
+            id = "Orca-core"
             implementationClass = "com.occ.orca.OrcaPlugin"
         }
     }
@@ -84,7 +84,7 @@ afterEvaluate {
             create("release",MavenPublication::class.java){
                 from(components.getAt("java"))
                 groupId = "com.occ.orca"
-                artifactId = "orca-plugin"
+                artifactId = "orca-core"
                 version = pVersion
             }
         }
