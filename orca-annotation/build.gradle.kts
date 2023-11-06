@@ -6,11 +6,9 @@ plugins {
 
 android {
     compileSdk = 31
-
+    namespace = "com.orca.annotation"
     defaultConfig {
         minSdk = 21
-        targetSdk = 31
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -25,11 +23,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlinOptions{
+        jvmTarget = "17"
     }
 }
 

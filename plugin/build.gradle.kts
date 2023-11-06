@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.konan.properties.Properties
 buildscript {
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
         //classpath("com.novoda:bintray-release:0.9.2")
     }
 
@@ -27,10 +27,11 @@ properties.load(project.file("../local.properties").inputStream())
 
 val pVersion = "2.3.0"
 
-val parentDir = project.rootDir.path
+val parentDir = project.rootDir.parentFile.path
 val orca_core = file(parentDir + File.separator + "orca-core")
 val archivesBaseName = "Orca"
 var jarFile = "build/libs/plugin-$pVersion.jar"
+println("orca_core path = $orca_core")
 task("zipNative",Zip::class){
     destinationDirectory.set(project.file("build/libs"))
     archiveFileName.set("$archivesBaseName-${pVersion}.jarx")
@@ -57,8 +58,8 @@ tasks.getByName("jar").finalizedBy("zipNative")
 dependencies {
     compileOnly(gradleApi())
     //implementation("androidx.annotation:annotation:1.3.0")
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
-    compileOnly("com.android.tools.build:gradle:7.2.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
+    compileOnly("com.android.tools.build:gradle:8.1.2")
     implementation("com.squareup:javapoet:1.13.0")
     implementation("com.squareup:kotlinpoet:1.9.0")
     implementation("org.javassist:javassist:3.20.0-GA")
@@ -74,9 +75,7 @@ gradlePlugin {
 }
 
 kotlin{
-    kotlinDslPluginOptions{
-        jvmTarget.set("11")
-    }
+    jvmToolchain(17)
 }
 
 afterEvaluate {

@@ -4,14 +4,12 @@ buildscript {
         google()
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
     }
 }
 
 kotlin{
-    kotlinDslPluginOptions{
-        jvmTarget.set("11")
-    }
+    jvmToolchain(17)
 }
 
 plugins {
@@ -27,8 +25,8 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31")
-    compileOnly("com.android.tools.build:gradle:7.2.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
+    compileOnly("com.android.tools.build:gradle:8.1.2")
     annotationProcessor("com.google.auto.service:auto-service:1.0")
     implementation("org.ow2.asm:asm:9.2")
     implementation("org.ow2.asm:asm-commons:9.2")
@@ -40,7 +38,7 @@ gradlePlugin {
     plugins {
         create("Orca-compiler") {
             id = "Orca-compiler"
-            implementationClass = "com.orcc.compiler.CompilerPlugin"
+            implementationClass = "com.occ.compiler.CompilerPlugin"
         }
     }
 }
