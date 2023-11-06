@@ -2,9 +2,9 @@
 
 buildscript {
 
-    val kotlin_version by extra("1.9.20")
+    val kotlin_version by extra("1.8.10")
     rootProject.extra.apply {
-        set("kotlin_version", "1.9.20")
+        set("kotlin_version", kotlin_version)
     }
     repositories {
         maven{setUrl("https://maven.aliyun.com/nexus/content/groups/public/")}

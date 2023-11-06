@@ -4,7 +4,6 @@ buildscript {
 
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
-        //classpath("com.novoda:bintray-release:0.9.2")
     }
 
 }
@@ -57,7 +56,6 @@ tasks.getByName("jar").finalizedBy("zipNative")
 
 dependencies {
     compileOnly(gradleApi())
-    //implementation("androidx.annotation:annotation:1.3.0")
     compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
     compileOnly("com.android.tools.build:gradle:8.1.2")
     implementation("com.squareup:javapoet:1.13.0")

@@ -1,6 +1,5 @@
 package com.occ.orca
 
-import com.android.build.api.artifact.MultipleArtifact
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.android.build.gradle.TestedExtension
@@ -9,17 +8,11 @@ import com.occ.orca.task.GenerateCMakeLists
 import com.occ.orca.task.GenerateJavaClientFileTask
 import com.occ.orca.task.GenerateOccSoHeaderTask
 import com.occ.orca.task.GenerateRewriteJavaTask
-import javassist.ClassPool
-import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.OutputFiles
-import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.register
 import java.io.File
-import java.util.*
+import java.util.Locale
 
 class OrcaPlugin : Plugin<Project> {
 
@@ -49,19 +42,20 @@ class OrcaPlugin : Plugin<Project> {
         copyNativeCode(nativeOriginPath, android, project)
         project.extensions.getByType(AndroidComponentsExtension::class.java)
             .apply {
-                beforeVariants {
-                    android.sourceSets {
-                        val outputDir = File(project.buildDir, "/generated/source/orca/${it.name}")
-                        findByName(it.name)?.apply {
+                beforeVariants { variant ->
+                    val set = android.sourceSets
+                    set.apply{
+                        val outputDir = File(project.buildDir, "/generated/source/orca/${variant.name}")
+                        findByName(variant.name)?.apply {
                             println("add sourceSet path = $outputDir")
                             java.srcDir(outputDir)
                             kotlin.srcDir(outputDir)
                         }
                     }
                 }
-                onVariants {
+                onVariants { variant ->
                     project.afterEvaluate {
-                        buildTask(nativeOriginPath, it, project, android)
+                        buildTask(nativeOriginPath, variant, project, android)
                     }
                 }
             }
