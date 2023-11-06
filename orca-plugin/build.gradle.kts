@@ -25,12 +25,12 @@ plugins {
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
 
-val pVersion = "2.3.9"
+val pVersion = "2.4.0"
 
 val parentDir = project.rootDir.parentFile.path
 val orca_core = file(parentDir + File.separator + "orca-core")
-val archivesBaseName = "orca-plugin"
-var jarFile = "build/libs/orca-plugin-${pVersion}.jar"
+val archivesBaseName = "orca-core"
+var jarFile = "build/libs/orca-core-${pVersion}.jar"
 println("orca_core path = $orca_core")
 task("zipNative",Zip::class){
     destinationDirectory.set(project.file("build/libs"))
