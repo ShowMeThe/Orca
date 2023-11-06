@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.application'
-    id 'Orca'
+    id 'Orca-core'
     id 'kotlin-android'
-//    id 'Orca-compiler'
+    id 'Orca-compiler'
 }
 
 android {

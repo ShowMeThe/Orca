@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
     compileOnly("com.android.tools.build:gradle:8.1.2")
     annotationProcessor("com.google.auto.service:auto-service:1.0")
     implementation("org.ow2.asm:asm:9.2")

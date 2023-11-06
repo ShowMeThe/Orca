@@ -29,12 +29,12 @@ val pVersion = "2.4.0"
 
 val parentDir = project.rootDir.parentFile.path
 val orca_core = file(parentDir + File.separator + "orca-core")
-val archivesBaseName = "orca-core"
-var jarFile = "build/libs/orca-core-${pVersion}.jar"
+val archivesBaseName = "orca-plugin"
+var jarFile = "build/libs/${archivesBaseName}.jar"
 println("orca_core path = $orca_core")
 task("zipNative",Zip::class){
     destinationDirectory.set(project.file("build/libs"))
-    archiveFileName.set("$archivesBaseName-${pVersion}.jarx")
+    archiveFileName.set("$archivesBaseName.jarx")
     from(project.zipTree(jarFile))
     include("META-INF/**")
     include("com/**")
@@ -45,7 +45,7 @@ task("zipNative",Zip::class){
 
     doLast {
         val originJar = project.file(jarFile)
-        val xJar = project.file("build/libs/$archivesBaseName-${pVersion}.jarx")
+        val xJar = project.file("build/libs/$archivesBaseName.jarx")
         originJar.delete()
         xJar.renameTo(originJar)
     }
@@ -58,7 +58,7 @@ tasks.getByName("jar").finalizedBy("zipNative")
 dependencies {
     compileOnly(gradleApi())
     //implementation("androidx.annotation:annotation:1.3.0")
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
     compileOnly("com.android.tools.build:gradle:8.1.2")
     implementation("com.squareup:javapoet:1.13.0")
     implementation("com.squareup:kotlinpoet:1.9.0")
@@ -85,15 +85,9 @@ afterEvaluate {
                 from(components.getAt("java"))
                 groupId = "com.occ.orca"
                 artifactId = "orca-core"
-                version = pVersion
             }
         }
     }
 }
-
-
-/*plugins.apply("com.github.dcendents.android-maven")*/
-//group = "com.occ.orca"
-version = pVersion
 
 

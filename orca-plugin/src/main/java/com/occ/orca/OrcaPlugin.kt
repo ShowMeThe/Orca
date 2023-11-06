@@ -261,7 +261,8 @@ class OrcaPlugin : Plugin<Project> {
         var result: Any? = null
         project.buildscript.configurations.forEach { config ->
             val file = config.files.find {
-                it.path.contains("orca", true) && (it.name.contains("plugin", true))
+                it.path.contains("orca", true) && (it.name.contains("core", true)
+                        || it.name.contains("plugin", true))
             }
             if (file != null) {
                 result = project.zipTree(file)
