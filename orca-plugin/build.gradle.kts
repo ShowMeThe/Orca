@@ -26,9 +26,9 @@ properties.load(project.file("../local.properties").inputStream())
 
 val pVersion = "2.4.0"
 
-val parentDir = project.rootDir.parentFile.path
-val orca_core = file(parentDir + File.separator + "orca-core")
+val parentDir = project.rootDir.path
 val archivesBaseName = "orca-plugin"
+val orca_core = file(parentDir + File.separator + "orca-core")
 var jarFile = "build/libs/${archivesBaseName}-${pVersion}.jar"
 println("orca_core path = $orca_core")
 task("zipNative",Zip::class){
@@ -37,7 +37,7 @@ task("zipNative",Zip::class){
     from(project.zipTree(jarFile))
     include("META-INF/**")
     include("com/**")
-    from(orca_core)
+    from(orca_core.path)
     include("src/main/**")
     exclude("CMakeLists.txt")
     exclude("src/main/AndroidManifest.xml")
@@ -51,7 +51,7 @@ task("zipNative",Zip::class){
 }
 
 
-tasks.getByName("assemble").finalizedBy("zipNative")
+tasks.getByName("inspectClassesForKotlinIC").finalizedBy("zipNative")
 
 
 dependencies {
