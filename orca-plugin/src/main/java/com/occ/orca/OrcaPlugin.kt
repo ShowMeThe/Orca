@@ -174,7 +174,7 @@ class OrcaPlugin : Plugin<Project> {
             this.nativeOriginPath = nativeOriginPath
         }
 
-        val variantName = StringUtils.substring(variant.name)
+            val variantName = StringUtils.substring(variant.name)
 
         val configTask = project.tasks.filter {
             it.name.startsWith("configureCMake")

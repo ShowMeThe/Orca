@@ -28,6 +28,10 @@ class Go(val project: Project) {
 
     var cacheValue = false
 
+    //Enable CompilerPlugin
+    var enableCompiler = true
+    var instrumentalList = arrayListOf<String>()
+
     fun storeSet(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
         println("encrypt start closure")
         keys.configure(closure)

@@ -24,7 +24,7 @@ plugins {
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
 
-val pVersion = "2.4.0"
+val pVersion = "2.4.1"
 
 val parentDir = project.rootDir.path
 val archivesBaseName = "orca-plugin"
@@ -61,6 +61,11 @@ dependencies {
     implementation("com.squareup:javapoet:1.13.0")
     implementation("com.squareup:kotlinpoet:1.9.0")
     implementation("org.javassist:javassist:3.20.0-GA")
+    annotationProcessor("com.google.auto.service:auto-service:1.0")
+    implementation("org.ow2.asm:asm:9.2")
+    implementation("org.ow2.asm:asm-commons:9.2")
+    implementation("org.ow2.asm:asm-tree:9.2")
+    implementation("org.ow2.asm:asm-util:9.2")
 }
 
 gradlePlugin {
@@ -68,6 +73,10 @@ gradlePlugin {
         create("Orca-core") {
             id = "Orca-core"
             implementationClass = "com.occ.orca.OrcaPlugin"
+        }
+        create("Orca-compiler") {
+            id = "Orca-compiler"
+            implementationClass = "com.occ.orca.CompilerPlugin"
         }
     }
 }

@@ -17,7 +17,6 @@ plugins {
     `java-gradle-plugin`
     id("maven-publish")
 }
-
 repositories {
     google()
     mavenCentral()
@@ -27,11 +26,7 @@ dependencies {
     compileOnly(gradleApi())
     compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
     compileOnly("com.android.tools.build:gradle:8.1.2")
-    annotationProcessor("com.google.auto.service:auto-service:1.0")
-    implementation("org.ow2.asm:asm:9.2")
-    implementation("org.ow2.asm:asm-commons:9.2")
-    implementation("org.ow2.asm:asm-tree:9.2")
-    implementation("org.ow2.asm:asm-util:9.2")
+    compileOnly(":orca-plugin")
 }
 
 gradlePlugin {

@@ -1,9 +1,10 @@
-package com.occ.compiler
+package com.occ.orca
 
 import com.android.build.api.instrumentation.*
 import com.android.build.api.variant.AndroidComponentsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.objectweb.asm.*
@@ -16,16 +17,17 @@ class CompilerPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.extensions.getByType(AndroidComponentsExtension::class.java).apply {
             this.onVariants { variant ->
-                variant.instrumentation.transformClassesWith(
-                    ClassVisitorFactory::class.java,
-                    InstrumentationScope.PROJECT
-                ) {
-                    it.projectName.set(project.name)
-                    val go = (project.extensions.findByName("Orca") as Orca).go
-
+                val go = (project.extensions.findByName("Orca") as Orca).go
+                if (go.enableCompiler) {
+                    variant.instrumentation.transformClassesWith(
+                        ClassVisitorFactory::class.java,
+                        InstrumentationScope.PROJECT
+                    ) {
+                        it.projectName.set(project.name)
+                        it.instrumentalList.set(go.instrumentalList.toList())
+                    }
+                    variant.instrumentation.setAsmFramesComputationMode(FramesComputationMode.COPY_FRAMES)
                 }
-
-                variant.instrumentation.setAsmFramesComputationMode(FramesComputationMode.COPY_FRAMES)
             }
         }
     }
@@ -37,19 +39,29 @@ interface InstrumentationImp : InstrumentationParameters {
     val projectName: Property<String>
 
     @get:Input
-    val instrumentalList: Property<ArrayList<String>>
+    val instrumentalList: ListProperty<String>
 }
 
 abstract class ClassVisitorFactory : AsmClassVisitorFactory<InstrumentationImp> {
+
     override fun createClassVisitor(
         classContext: ClassContext,
         nextClassVisitor: ClassVisitor
     ): ClassVisitor {
-        return CoreClassNode(nextClassVisitor,parameters.get().projectName.get())
+        return CoreClassNode(nextClassVisitor, parameters.get().projectName.get())
     }
 
     override fun isInstrumentable(classData: ClassData): Boolean {
-        return true
+        val list = parameters.get().instrumentalList.get()
+            .map {
+                Regex(it)
+            }
+        val clazz = classData.className
+        val isInstrumentation = if (list.isEmpty()) true else list.any { regex ->
+            regex.containsMatchIn(clazz)
+        }
+        println("isInstrumentable name = [${clazz}] isInstrumentable =[${isInstrumentation}]")
+        return isInstrumentation
     }
 }
 

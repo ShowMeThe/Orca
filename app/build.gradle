@@ -7,7 +7,7 @@ plugins {
 
 android {
     compileSdk 31
-    namespace  "com.orcinus.orca"
+    namespace "com.orcinus.orca"
     defaultConfig {
         applicationId "com.orcinus.orca"
         minSdkVersion 21
@@ -19,22 +19,25 @@ android {
     }
 
 
-    Orca.go{
+    Orca.go {
         isDebug = true
         encryptMode = "des"
         isBuildKotlin = false
         cacheValue = true
-        storeSet{
-            "base"{
+        instrumentalList = [
+                "com.example.test.AndroidViewModel"
+        ]
+        storeSet {
+            "base" {
                 value "222222"
             }
-            "base2"{
+            "base2" {
                 value "91239812931291"
             }
-            "base3"{
+            "base3" {
                 value "ksajdpjfopak[pwskdopasodpapo"
             }
-            "base4"{
+            "base4" {
                 value "htttps://wwww.google.com.hk"
             }
         }
@@ -66,5 +69,5 @@ dependencies {
 
     //implementation project(":test_library")
     implementation project(":orca-annotation")
-   // implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
+    // implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
 }
