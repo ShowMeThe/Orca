@@ -10,6 +10,9 @@
 #include "include/core-environment.h"
 #include "include/core-encryption.h"
 #include <string>
+#include <csignal>
+#include <sys/ptrace.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -32,6 +35,24 @@ JNINativeMethod methods[] = {
         { "getString", "(Ljava/lang/String;)Ljava/lang/String;",(void*)getString},
 };
 
+volatile int signal_capture = 0;
+void signal_handler(int sig){
+    signal_capture = 1;
+}
+
+jboolean checkSomething(){
+    signal(SIGTRAP ,signal_handler);
+    raise(SIGTRAP);
+    if(!signal_capture){
+        return JNI_FALSE;
+    }
+    if(ptrace(PTRACE_ATTACH,0, nullptr) == -1){
+        return JNI_FALSE;
+    }
+
+
+    return JNI_TRUE;
+}
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
@@ -40,6 +61,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
     environments = new environment(env,nullptr);
     if (!environments->checkSignature()) {
+        return JNI_ERR;
+    }
+
+    if(!(DEBUG || checkSomething())){
         return JNI_ERR;
     }
 
@@ -58,8 +83,5 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     LOAD_MAP(local_map);
     return JNI_VERSION_1_6;
 }
-
-
-
 
 
