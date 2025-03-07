@@ -21,8 +21,6 @@ class CompilerPlugin : Plugin<Project> {
                     InstrumentationScope.PROJECT
                 ) {
                     it.projectName.set(project.name)
-                    val go = (project.extensions.findByName("Orca") as Orca).go
-
                 }
 
                 variant.instrumentation.setAsmFramesComputationMode(FramesComputationMode.COPY_FRAMES)
