@@ -6,8 +6,10 @@ import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
+import javax.management.InvalidApplicationException
 
 open class GenerateOccSoHeaderTask : DefaultTask() {
 
@@ -41,6 +43,9 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
     @Input
     var cacheValue = false
 
+    @Input
+    var applicationWhiteList = ArrayList<String>()
+
     @TaskAction
     fun generate() {
         val inputFileDir = File(inputFileDirPath)
@@ -71,12 +76,29 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
             "#ifndef ORCA_CORE_CLIENT_H\n" +
                     "#define ORCA_CORE_CLIENT_H\n"
         )
-
         lines.add(
             "#include <jni.h>\n" +
                     "#include <map>\n" +
                     "#include <string>\n"
         )
+
+        val sf = StringBuffer()
+        applicationWhiteList.map {
+            when (encryptMode) {
+                "AES" -> {
+                    AESEncryption.encrypt(secretKey, it)
+                }
+                "DES" -> {
+                    DESEncryption.encrypt(secretKey, it)
+                }
+                else -> {
+                    AESEncryption.encrypt(secretKey, it)
+                }
+            }
+        }.onEach {
+            sf.append("\"${it}\"")
+        }
+        lines.add("static const std::string CD_NAME[] = {$sf};\n")
 
         lines.add("#define CA \"$signature\"\n")
 

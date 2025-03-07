@@ -5,6 +5,7 @@
 #include "include/core_util.h"
 #include "include/core-encryption.h"
 #include "include/core-client.h"
+#include "include/obfuscate.h"
 
 using namespace std;
 
@@ -13,12 +14,13 @@ map<string, jobject> mKeyMap;
 encryption::encryption(JNIEnv *jniEnv, jobject context) {
     this->jniEnv = jniEnv;
     this->_context = context;
+
 }
 
 jstring encryption::decrypt(const char *key, const char *data) {
     jstring cipherString = jniEnv->NewStringUTF(data);
-    string storeKey = jstring2string(jniEnv,cipherString);
-    if(CD){
+    string storeKey = jstring2string(jniEnv, cipherString);
+    if (CD) {
         if (mKeyMap[storeKey] != nullptr) {
             return (jstring) mKeyMap[storeKey];
         }
@@ -33,22 +35,23 @@ jstring encryption::decrypt(const char *key, const char *data) {
     }
     jclass encrypt_clz = jniEnv->FindClass(class_path.data());
     if (encrypt_clz != nullptr) {
-        jmethodID decrypt_method_id = jniEnv->GetStaticMethodID(encrypt_clz, "decrypt",
-                                                                "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+        jmethodID decrypt_method_id = jniEnv->GetStaticMethodID(encrypt_clz,
+                                                                AY_OBFUSCATE("decrypt"),
+                                                                AY_OBFUSCATE(
+                                                                        "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"));
         if (decrypt_method_id != nullptr) {
             jstring keyString = jniEnv->NewStringUTF(key);
             auto result = (jstring) jniEnv->CallStaticObjectMethod(encrypt_clz,
                                                                    decrypt_method_id, keyString,
                                                                    cipherString);
-//            char *resultChars = const_cast<char *>(jniEnv->GetStringUTFChars(result, JNI_FALSE));
             jniEnv->DeleteLocalRef(keyString);
             jniEnv->DeleteLocalRef(cipherString);
-            if(CD){
+            if (CD) {
                 auto globalRef = jniEnv->NewGlobalRef(result);
                 mKeyMap[storeKey] = globalRef;
                 jniEnv->DeleteLocalRef(result);
                 return (jstring) globalRef;
-            }else{
+            } else {
                 return result;
             }
         }

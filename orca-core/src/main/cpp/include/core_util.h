@@ -5,11 +5,21 @@
 #ifndef ORCA_CORE_UTIL_H
 #define ORCA_CORE_UTIL_H
 
+#include <jni.h>
 #include <string>
 #include <sstream>
 #include <android/log.h>
 
+using namespace std;
+
 #define LOG(...)__android_log_print(ANDROID_LOG_INFO, "Occ-core", __VA_ARGS__)
+
+static std::string jstring2string(JNIEnv* env, jstring jstr) {
+    char* chars = (char *) env->GetStringChars(jstr, nullptr);
+    std::string str(chars, env->GetStringLength(jstr));
+    env->ReleaseStringChars(jstr, env->GetStringChars(jstr, nullptr));
+    return str;
+}
 
 
 #endif //ORCA_CORE_UTIL_H

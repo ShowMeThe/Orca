@@ -5,5 +5,5 @@ rootProject.name = "orca"
 //include("test_library")
 include("orca-annotation")
 include("orca-plugin")
-//include("orca-compiler")
+include("orca-compiler")
 

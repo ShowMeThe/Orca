@@ -16,7 +16,7 @@ private:
     jobject _context;
     jobject getPackageInfo();
     jstring getPackageName();
-
+    jstring get(const char *className);
 
 public:
 
@@ -27,6 +27,7 @@ public:
     jobject getApplicationContext(jobject context);
 
     jobject getContext();
+
 };
 
 

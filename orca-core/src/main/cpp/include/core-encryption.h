@@ -8,6 +8,8 @@
 #include <jni.h>
 #include <string>
 
+
+
 class encryption {
 
 private:
@@ -19,12 +21,6 @@ public:
 
     jstring decrypt(const char *key, const char *data);
 
-    std::string jstring2string(JNIEnv* env, jstring jstr) {
-        char* chars = (char *) env->GetStringChars(jstr, nullptr);
-        std::string str(chars, env->GetStringLength(jstr));
-        env->ReleaseStringChars(jstr, env->GetStringChars(jstr, nullptr));
-        return str;
-    }
 };
 
 
