@@ -167,6 +167,7 @@ class OrcaPlugin : Plugin<Project> {
             this.keys = go.keys
             this.debug = go.isDebug
             this.cacheValue = go.cacheValue
+            this.applicationWhiteList = go.whiteApplicationList
             this.header = project.name
             this.signature = localSignature
             this.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)

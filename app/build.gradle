@@ -24,6 +24,9 @@ android {
         encryptMode = "des"
         isBuildKotlin = false
         cacheValue = true
+        whiteApplicationList =[
+                "com.example.test.NextApplication"
+        ]
         instrumentalList = [
                 "com.example.test.AndroidViewModel"
         ]

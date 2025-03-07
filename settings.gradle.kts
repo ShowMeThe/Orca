@@ -1,9 +1,9 @@
 rootProject.name = "orca"
 
-//include("app")
-//include("orca-core")
+include("app")
+include("orca-core")
 //include("test_library")
 include("orca-annotation")
-include("orca-plugin")
-//include("orca-compiler")
+includeBuild("orca-plugin")
+includeBuild("orca-compiler")
 

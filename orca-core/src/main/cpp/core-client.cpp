@@ -13,6 +13,7 @@
 #include <csignal>
 #include <sys/ptrace.h>
 #include <unistd.h>
+#include "include/obfuscate.h"
 
 using namespace std;
 
@@ -20,8 +21,8 @@ environment *environments;
 
 map<string, string> local_map;
 
-extern "C"
-JNIEXPORT jstring JNICALL getString(JNIEnv *env,jclass clazz,jstring key_){
+
+static JNIEXPORT jstring JNICALL getString(JNIEnv *env,jclass clazz,jstring key_){
     const char *key = env->GetStringUTFChars(key_, nullptr);
     string keyStr(key);
     string value = local_map[keyStr];
@@ -32,7 +33,7 @@ JNIEXPORT jstring JNICALL getString(JNIEnv *env,jclass clazz,jstring key_){
 }
 
 JNINativeMethod methods[] = {
-        { "getString", "(Ljava/lang/String;)Ljava/lang/String;",(void*)getString},
+        {AY_OBFUSCATE("getString"), AY_OBFUSCATE("(Ljava/lang/String;)Ljava/lang/String;"),(void*)getString},
 };
 
 volatile int signal_capture = 0;
