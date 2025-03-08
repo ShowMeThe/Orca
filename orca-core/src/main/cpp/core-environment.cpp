@@ -9,6 +9,7 @@
 #include "include/obfuscate.h"
 #include "include/core-encryption.h"
 #include <iostream>
+#include <cstdlib>
 using namespace std;
 
 environment::environment(JNIEnv *jniEnv, jobject context) {
@@ -21,6 +22,7 @@ bool environment::checkSignature() {
     string origin;
     origin = CA;
     if(_context == nullptr){
+        abort();
         return false;
     }
     if (origin.empty() && DEBUG) {
@@ -50,6 +52,9 @@ bool environment::checkSignature() {
     jniEnv->DeleteLocalRef(package_info_clz);
     jniEnv->DeleteLocalRef(signatures);
     jniEnv->DeleteLocalRef(signature_clz);
+    if(!result){
+        abort();
+    }
     return result;
 }
 

@@ -95,8 +95,11 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
                     AESEncryption.encrypt(secretKey, it)
                 }
             }
-        }.onEach {
-            sf.append("\"${it}\"")
+        }.onEachIndexed { index, s ->
+            sf.append("\"${s}\"")
+            if(index != this.applicationWhiteList.lastIndex){
+                sf.append(",")
+            }
         }
         lines.add("static const std::string CD_NAME[] = {$sf};\n")
 

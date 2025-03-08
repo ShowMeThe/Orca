@@ -28,9 +28,11 @@ class MainActivity : AppCompatActivity() {
 
         val tv = findViewById<View>(R.id.tv)
         tv.setOnClickListener {
-//            val startTime = System.currentTimeMillis()
-            Log.e("222222","base = ${AppCore.getBase()} ${data2} ${viewModel.getValue2()}")
-//            Log.e("222222","cost time = ${(System.currentTimeMillis() - startTime)}")
+            runCatching {
+                Log.e("222222","base = ${AppCore.getBase()} ${data2} ${viewModel.getValue2()}")
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
 
 
