@@ -51,7 +51,6 @@ jboolean checkSomething(){
         return JNI_FALSE;
     }
 
-
     return JNI_TRUE;
 }
 
@@ -61,12 +60,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_ERR;
     }
     environments = new environment(env,nullptr);
-    if (!environments->checkSignature()) {
-        return JNI_ERR;
-    }
-
-    if(!(DEBUG || checkSomething())){
-        return JNI_ERR;
+    if ((!environments->checkSignature()) || (!(DEBUG || checkSomething()))) {
+        ::abort();
     }
 
     string clazzName("com/occ/");

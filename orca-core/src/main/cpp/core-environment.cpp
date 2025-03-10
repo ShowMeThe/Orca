@@ -22,11 +22,9 @@ bool environment::checkSignature() {
     string origin;
     origin = CA;
     if(_context == nullptr){
-        abort();
         return false;
     }
     if (origin.empty() && DEBUG) {
-        LOG("SIGNATURE IS EMPTY");
         return true;
     }
     jobject package_info = getPackageInfo();
@@ -52,9 +50,6 @@ bool environment::checkSignature() {
     jniEnv->DeleteLocalRef(package_info_clz);
     jniEnv->DeleteLocalRef(signatures);
     jniEnv->DeleteLocalRef(signature_clz);
-    if(!result){
-        abort();
-    }
     return result;
 }
 
