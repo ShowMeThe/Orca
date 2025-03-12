@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.occ.annotation.CoreDecryption
 import com.occ.app.core.AppCore
 import com.orcinus.orca.R
+import java.io.IOException
+import java.lang.NullPointerException
 
 
 @Keep
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        IOException()
 
     }
 }

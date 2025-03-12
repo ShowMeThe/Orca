@@ -27,6 +27,7 @@ class GenerateCMakeLists(val project: Project) {
                 "        ${targetPath}/src/main/cpp/core-client.cpp\n" +
                 "        ${targetPath}/src/main/cpp/core-environment.cpp\n" +
                 "        ${targetPath}/src/main/cpp/core-encryption.cpp\n" +
+                "        ${targetPath}/src/main/cpp/core-come-true.cpp\n" +
                 ")")
         lines.add("\nfind_library(\n" +
                 "              log-lib\n" +

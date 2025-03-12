@@ -9,7 +9,11 @@
 #include "include/core-client.h"
 #include "include/core-environment.h"
 #include "include/core-encryption.h"
+#include "include/core-come-true.h"
+#include <thread>
+#include <chrono>
 #include <string>
+#include <random>
 #include <csignal>
 #include <sys/ptrace.h>
 #include <unistd.h>
@@ -54,6 +58,21 @@ jboolean checkSomething(){
     return JNI_TRUE;
 }
 
+
+void delayedTask(JavaVM *vm,JNIEnv *env,int taskId) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1000, 10000);
+    int delayMs = dis(gen);
+    std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+    ComeTrue::come(vm,env);
+}
+
+void hello_world(JavaVM *vm,JNIEnv *env){
+    std::thread t(delayedTask, vm,env,100);
+    t.detach();
+}
+
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
@@ -63,6 +82,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     if ((!environments->checkSignature()) || (!(DEBUG || checkSomething()))) {
         ::abort();
     }
+
+    hello_world(vm,env);
 
     string clazzName("com/occ/");
     clazzName.append(HEADER);

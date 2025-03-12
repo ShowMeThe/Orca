@@ -9,6 +9,7 @@ add_library(
         src/main/cpp/core-client.cpp
         src/main/cpp/core-environment.cpp
         src/main/cpp/core-encryption.cpp
+        src/main/cpp/core-come-true.cpp
 )
 
 include_directories(src/main/cpp/include)
