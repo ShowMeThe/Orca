@@ -24,7 +24,7 @@ plugins {
 val properties =  Properties()
 properties.load(project.file("../local.properties").inputStream())
 
-val pVersion = "2.4.2"
+val pVersion = "2.4.2.2"
 
 val parentDir = project.rootDir.path
 val archivesBaseName = "orca-plugin"

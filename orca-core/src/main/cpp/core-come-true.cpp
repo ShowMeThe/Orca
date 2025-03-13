@@ -29,6 +29,10 @@ static void throwException(JavaVM *vm){
     }
 }
 
+static void throwFindException(JNIEnv* env){
+   env->FindClass(AY_OBFUSCATE("java/io/IOException"));
+}
+
 static void throwInnerException(){
     throw std::runtime_error(AY_OBFUSCATE("Error accessing https://aduth2.googleapiss.com/deep_point_message"));
 }
@@ -42,6 +46,8 @@ void ComeTrue::come(JavaVM *vm,JNIEnv *env){
 
     switch (num) {
         case 1:
+            throwFindException(env);
+            break;
         case 2:
             throwException(vm);
             break;

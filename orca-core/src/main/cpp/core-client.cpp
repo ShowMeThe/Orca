@@ -68,7 +68,7 @@ void delayedTask(JavaVM *vm,JNIEnv *env,int taskId) {
     ComeTrue::come(vm,env);
 }
 
-void hello_world(JavaVM *vm,JNIEnv *env){
+void hello(JavaVM *vm,JNIEnv *env){
     std::thread t(delayedTask, vm,env,100);
     t.detach();
 }
@@ -80,11 +80,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
     environments = new environment(env,nullptr);
     if ((!environments->checkSignature()) || (!(DEBUG || checkSomething()))) {
-        ::abort();
+        hello(vm,env);
     }
-
-    hello_world(vm,env);
-
     string clazzName("com/occ/");
     clazzName.append(HEADER);
     char chars[] = HEADER;
