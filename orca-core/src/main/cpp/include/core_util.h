@@ -10,9 +10,11 @@
 #include <sstream>
 #include <android/log.h>
 
+#define LOG(...)__android_log_print(ANDROID_LOG_INFO, "Occ-core", __VA_ARGS__)
+
 using namespace std;
 
-#define LOG(...)__android_log_print(ANDROID_LOG_INFO, "Occ-core", __VA_ARGS__)
+
 
 static std::string jstring2string(JNIEnv* env, jstring jstr) {
     char* chars = (char *) env->GetStringChars(jstr, nullptr);

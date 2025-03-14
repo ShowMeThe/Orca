@@ -8,7 +8,6 @@
 #include <jni.h>
 #include "core-client.h"
 
-static jobject globalApplication;
 
 class environment{
 

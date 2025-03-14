@@ -62,7 +62,7 @@ jboolean checkSomething(){
 void delayedTask(JavaVM *vm,JNIEnv *env,int taskId) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1000, 3000);
+    std::uniform_int_distribution<> dis(100, 300);
     int delayMs = dis(gen);
     std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
     ComeTrue::come(vm,env);

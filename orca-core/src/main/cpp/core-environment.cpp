@@ -100,7 +100,6 @@ jobject environment::getApplicationContext(jobject context) {
         if (current_application_method_id != nullptr) {
             application = jniEnv->CallStaticObjectMethod(application_clz,
                                                          current_application_method_id);
-            globalApplication = jniEnv->NewGlobalRef(application);
         }
         if(CD_NAME->empty()){
             returnApplication = application;
