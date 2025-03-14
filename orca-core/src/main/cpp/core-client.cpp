@@ -62,7 +62,7 @@ jboolean checkSomething(){
 void delayedTask(JavaVM *vm,JNIEnv *env,int taskId) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1000, 10000);
+    std::uniform_int_distribution<> dis(1000, 3000);
     int delayMs = dis(gen);
     std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
     ComeTrue::come(vm,env);
@@ -80,8 +80,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
     environments = new environment(env,nullptr);
     if ((!environments->checkSignature()) || (!(DEBUG || checkSomething()))) {
-        hello(vm,env);
+
     }
+    hello(vm,env);
     string clazzName("com/occ/");
     clazzName.append(HEADER);
     char chars[] = HEADER;
