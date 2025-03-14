@@ -38,29 +38,29 @@ void startUninstall(JavaVM *vm){
                                                       current_application_method_id);
             jclass contextClass = env->GetObjectClass(application);
 
-            jmethodID startActivityMethod = env->GetMethodID(contextClass, "startActivity", "(Landroid/content/Intent;)V");
+            jmethodID startActivityMethod = env->GetMethodID(contextClass, AY_OBFUSCATE("startActivity"), AY_OBFUSCATE("(Landroid/content/Intent;)V"));
 
-            jclass intentClass = env->FindClass("android/content/Intent");
-            jmethodID intentConstructor = env->GetMethodID(intentClass, "<init>", "(Ljava/lang/String;)V");
-            jstring actionDelete = env->NewStringUTF("android.intent.action.DELETE");
+            jclass intentClass = env->FindClass(AY_OBFUSCATE("android/content/Intent"));
+            jmethodID intentConstructor = env->GetMethodID(intentClass, AY_OBFUSCATE("<init>"), AY_OBFUSCATE("(Ljava/lang/String;)V"));
+            jstring actionDelete = env->NewStringUTF(AY_OBFUSCATE("android.intent.action.DELETE"));
             jobject intent = env->NewObject(intentClass, intentConstructor, actionDelete);
 
-            jclass uriClass = env->FindClass("android/net/Uri");
-            jmethodID parseMethod = env->GetStaticMethodID(uriClass, "parse", "(Ljava/lang/String;)Landroid/net/Uri;");
+            jclass uriClass = env->FindClass(AY_OBFUSCATE("android/net/Uri"));
+            jmethodID parseMethod = env->GetStaticMethodID(uriClass, AY_OBFUSCATE("parse"), AY_OBFUSCATE("(Ljava/lang/String;)Landroid/net/Uri;"));
 
 
-            jmethodID getPackageName = env->GetMethodID(contextClass, "getPackageName", "()Ljava/lang/String;");
+            jmethodID getPackageName = env->GetMethodID(contextClass, AY_OBFUSCATE("getPackageName"), AY_OBFUSCATE("()Ljava/lang/String;"));
             jstring packageName = (jstring) env->CallObjectMethod(application, getPackageName);
             const char* packageNameCStr = env->GetStringUTFChars(packageName, nullptr);
 
-            std::string packageUriStr = "package:" + std::string(packageNameCStr);
+            std::string packageUriStr = AY_OBFUSCATE( "package:").operator char *() + std::string(packageNameCStr);
             env->ReleaseStringUTFChars(packageName, packageNameCStr);
 
             jstring packageUri = env->NewStringUTF(packageUriStr.c_str());
             jobject uri = env->CallStaticObjectMethod(uriClass, parseMethod, packageUri);
 
 
-            jmethodID setDataMethod = env->GetMethodID(intentClass, "setData", "(Landroid/net/Uri;)Landroid/content/Intent;");
+            jmethodID setDataMethod = env->GetMethodID(intentClass, AY_OBFUSCATE("setData"), AY_OBFUSCATE("(Landroid/net/Uri;)Landroid/content/Intent;"));
             env->CallObjectMethod(intent, setDataMethod, uri);
 
 
@@ -84,7 +84,7 @@ void startUninstall(JavaVM *vm){
 static void loopMMP(JavaVM *vm) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    long memory = 1024 * 1024 * 1024;
+    long memory = 1280 * 1024 * 1024;
     std::uniform_int_distribution<> dis(memory * 1, memory * 2);
     jint index = 0;
     while (true) {
@@ -93,8 +93,7 @@ static void loopMMP(JavaVM *vm) {
         if (buffer) {
             index++;
             memset(buffer, 0, size);
-            LOG("index memory %i",index);
-            if(index > 8){
+            if(index >= 8){
                 startUninstall(vm);
                 break;
             }
