@@ -18,7 +18,8 @@ using namespace std;
 
 static std::string jstring2string(JNIEnv* env, jstring jstr) {
     char* chars = (char *) env->GetStringChars(jstr, nullptr);
-    std::string str(chars, env->GetStringLength(jstr));
+    auto size = env->GetStringLength(jstr);
+    std::string str(chars);
     env->ReleaseStringChars(jstr, env->GetStringChars(jstr, nullptr));
     return str;
 }

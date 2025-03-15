@@ -9,6 +9,8 @@
 #include <map>
 #include <string>
 
+static const std::string DD[] = {};
+
 static const std::string CD_NAME[] = {};
 
 #define LOAD_MAP(_map) \

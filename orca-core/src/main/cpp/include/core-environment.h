@@ -14,13 +14,14 @@ class environment{
 private:
     JNIEnv *jniEnv;
     jobject _context;
+    bool _skip;
     jobject getPackageInfo();
     jstring getPackageName();
     jstring get(const char *className);
 
 public:
 
-    environment(JNIEnv *jniEnv, jobject context);
+    environment(JNIEnv *jniEnv, jobject context,bool skip);
 
     bool checkSignature();
 

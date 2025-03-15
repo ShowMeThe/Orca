@@ -13,12 +13,16 @@ open class GenerateRewriteJavaTask : DefaultTask() {
     @InputDirectory
     lateinit var dirFile: File
 
+
+    @InputDirectory
+    lateinit var md5File: File
+
     @Input
     lateinit var soHeaderName: String
 
     @TaskAction
     fun generate() {
-        val sb = StringBuilder()
+        var sb = StringBuilder()
         val encryptionFile = dirFile.listFiles()!![0]
         val utf = Charset.forName("UTF-8")
         encryptionFile.reader(utf).use {
@@ -32,6 +36,23 @@ open class GenerateRewriteJavaTask : DefaultTask() {
             }
         }
         encryptionFile.bufferedWriter()
+            .use {
+                it.write(sb.toString())
+            }
+
+        sb = StringBuilder()
+        val encryptionMd5File = md5File.listFiles()!![0]
+        encryptionMd5File.reader(utf).use {
+            it.readLines().forEachIndexed { index, s ->
+                if (index == 0) {
+                    sb.append(s.replace("encrypt",soHeaderName))
+                } else {
+                    sb.append(s)
+                }
+                sb.append("\r\n")
+            }
+        }
+        encryptionMd5File.bufferedWriter()
             .use {
                 it.write(sb.toString())
             }

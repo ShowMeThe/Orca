@@ -4,6 +4,7 @@ import com.occ.orca.AESEncryption
 import com.occ.orca.DESEncryption
 import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
+import groovy.util.logging.Log
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.provider.Property
@@ -46,6 +47,9 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
     @Input
     var applicationWhiteList = ArrayList<String>()
 
+    @Input
+    var dexFileDir = ""
+
     @TaskAction
     fun generate() {
         val inputFileDir = File(inputFileDirPath)
@@ -81,6 +85,20 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
                     "#include <map>\n" +
                     "#include <string>\n"
         )
+        val sb = StringBuffer()
+        val task = DexMd5Task(dexFileDir)
+        val dexList = task.generate()
+        dexList.onEachIndexed { index, s ->
+            sb.append("\"${s}\"")
+            if(index != dexList.lastIndex){
+                sb.append(",")
+            }
+        }
+
+
+        println("GenerateOccSoHeaderTask core-client dexList ${sb}")
+        lines.add("static const std::string DD[] = {$sb};\n")
+
 
         val sf = StringBuffer()
         applicationWhiteList.map {
@@ -101,6 +119,7 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
                 sf.append(",")
             }
         }
+
         lines.add("static const std::string CD_NAME[] = {$sf};\n")
 
         lines.add("#define CA \"$signature\"\n")

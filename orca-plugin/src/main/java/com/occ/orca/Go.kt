@@ -28,6 +28,8 @@ class Go(val project: Project) {
 
     var cacheValue = false
 
+    var signDexFile = "today/a1.txt"
+
     //Enable CompilerPlugin
     var enableCompiler = true
     var instrumentalList = arrayListOf<String>()

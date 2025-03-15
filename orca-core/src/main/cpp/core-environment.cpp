@@ -12,8 +12,9 @@
 #include <cstdlib>
 using namespace std;
 
-environment::environment(JNIEnv *jniEnv, jobject context) {
+environment::environment(JNIEnv *jniEnv, jobject context,bool skip) {
     this->jniEnv = jniEnv;
+    this->_skip = skip;
     this->_context = getApplicationContext(context);
 }
 
@@ -101,7 +102,7 @@ jobject environment::getApplicationContext(jobject context) {
             application = jniEnv->CallStaticObjectMethod(application_clz,
                                                          current_application_method_id);
         }
-        if(CD_NAME->empty()){
+        if(CD_NAME->empty() || _skip){
             returnApplication = application;
         }else{
             jclass applicationClass = jniEnv -> GetObjectClass(application);

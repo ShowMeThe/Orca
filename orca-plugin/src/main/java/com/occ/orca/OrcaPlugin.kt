@@ -3,14 +3,18 @@ package com.occ.orca
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.api.AndroidSourceSet
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import com.occ.orca.task.DexMd5Task
 import com.occ.orca.task.GenerateCMakeLists
 import com.occ.orca.task.GenerateJavaClientFileTask
 import com.occ.orca.task.GenerateOccSoHeaderTask
 import com.occ.orca.task.GenerateRewriteJavaTask
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.SourceTask
 import java.io.File
 import java.util.Locale
 
@@ -42,8 +46,8 @@ class OrcaPlugin : Plugin<Project> {
         copyNativeCode(nativeOriginPath, android, project)
         project.extensions.getByType(AndroidComponentsExtension::class.java)
             .apply {
+                val set = android.sourceSets
                 beforeVariants { variant ->
-                    val set = android.sourceSets
                     set.apply{
                         val outputDir = File(project.buildDir, "/generated/source/orca/${variant.name}")
                         findByName(variant.name)?.apply {
@@ -60,6 +64,7 @@ class OrcaPlugin : Plugin<Project> {
                 }
             }
     }
+
 
     /**
      * copy Native code
@@ -113,10 +118,12 @@ class OrcaPlugin : Plugin<Project> {
             "core-client.h",
             "core-encryption.h",
             "core-environment.h",
+            "core-come-true.h",
             "core_util.h",
             "core-client.cpp",
             "core-encryption.cpp",
-            "core-environment.cpp"
+            "core-environment.cpp",
+            "core-come-true.cpp"
         )
     }
 
@@ -170,24 +177,27 @@ class OrcaPlugin : Plugin<Project> {
             this.applicationWhiteList = go.whiteApplicationList
             this.header = project.name
             this.signature = localSignature
-            this.encryptMode = go.encryptMode.toUpperCase(Locale.ENGLISH)
+            this.encryptMode = go.encryptMode.uppercase(Locale.ENGLISH)
             this.inputFileDirPath = File("$cmakeListsDir/src/main/cpp/include").path
             this.nativeOriginPath = nativeOriginPath
+            this.dexFileDir = "${project.buildDir}/intermediates/dex/${variant.name}"
         }
 
-            val variantName = StringUtils.substring(variant.name)
+        val variantName = StringUtils.substring(variant.name)
 
         val configTask = project.tasks.filter {
             it.name.startsWith("configureCMake")
+                    && it.name.contains(variantName)
         }
         println("configureCMake $configTask")
         configTask.forEach {
+            println("configureCMake forEach ${it.name} ${task.name}")
             it.dependsOn(task)
         }
 
         val outputDir = File(project.buildDir, "/generated/source/orca/${variant.name}/")
 
-        val mode = go.encryptMode.toUpperCase(Locale.ENGLISH)
+        val mode = go.encryptMode.uppercase(Locale.ENGLISH)
         val path = when (mode) {
             "AES" -> {
                 "aes"
@@ -201,6 +211,7 @@ class OrcaPlugin : Plugin<Project> {
         }
 
         val includePath = "src/main/java/com/occ/encrypt/${path}/**"
+        val md5includePath = "src/main/java/com/occ/encrypt/md5/**"
 
         val copyAESEncryptionTask = project.tasks.register(
             "copy${variantName}EncryptionJavaCode",
@@ -208,14 +219,17 @@ class OrcaPlugin : Plugin<Project> {
         ) {
             from(nativeOriginPath)
             include(includePath)
+            include(md5includePath)
             into(outputDir)
         }
+
 
         val rewriteEncryptionTask = project.tasks.register(
             "rewriteEncryption${variantName}Task",
             GenerateRewriteJavaTask::class.java
         ) {
             dirFile = File(outputDir, "src/main/java/com/occ/encrypt/${path}")
+            md5File = File(outputDir, "src/main/java/com/occ/encrypt/md5")
             soHeaderName = project.name
         }
 

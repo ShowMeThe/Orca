@@ -60,7 +60,6 @@ abstract class ClassVisitorFactory : AsmClassVisitorFactory<InstrumentationImp> 
         val isInstrumentation = if (list.isEmpty()) true else list.any { regex ->
             regex.containsMatchIn(clazz)
         }
-        println("isInstrumentable name = [${clazz}] isInstrumentable =[${isInstrumentation}]")
         return isInstrumentation
     }
 }

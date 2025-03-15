@@ -71,7 +71,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
                 } else {
                     val newName = name.toCharArray()
                     val char = newName[0]
-                    newName[0] = char.toUpperCase()
+                    newName[0] = char.uppercaseChar()
                     String(newName)
                 }
             }
