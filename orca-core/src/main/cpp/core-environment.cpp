@@ -15,7 +15,12 @@ using namespace std;
 environment::environment(JNIEnv *jniEnv, jobject context,bool skip) {
     this->jniEnv = jniEnv;
     this->_skip = skip;
-    this->_context = getApplicationContext(context);
+    auto ctx = checkApplicationContext(context);
+    if(_legal){
+        _context = ctx;
+    }else{
+        _context = nullptr;
+    }
 }
 
 
@@ -35,7 +40,7 @@ bool environment::checkSignature() {
     auto signatures = (jobjectArray) jniEnv->GetObjectField(package_info,
                                                             signatures_field_id);
     jclass signature_clz = jniEnv->FindClass(AY_OBFUSCATE("android/content/pm/Signature"));
-    jmethodID get_hashcode_method_id = jniEnv->GetMethodID(signature_clz, AY_OBFUSCATE("hashCode"), "()I");
+    jmethodID get_hashcode_method_id = jniEnv->GetMethodID(signature_clz, AY_OBFUSCATE("hashCode"), AY_OBFUSCATE("()I"));
     int size = jniEnv->GetArrayLength(signatures);
     bool result = false;
     for (int i = 0; i < size; i++) {
@@ -90,7 +95,7 @@ jobject environment::getContext() {
     return _context;
 }
 
-jobject environment::getApplicationContext(jobject context) {
+jobject environment::checkApplicationContext(jobject context) {
     jobject application = nullptr;
     jobject returnApplication = nullptr;
     jclass application_clz = jniEnv->FindClass(AY_OBFUSCATE("android/app/ActivityThread"));
@@ -102,8 +107,10 @@ jobject environment::getApplicationContext(jobject context) {
             application = jniEnv->CallStaticObjectMethod(application_clz,
                                                          current_application_method_id);
         }
+        returnApplication = application;
         if(CD_NAME->empty() || _skip){
-            returnApplication = application;
+            _legal = true;
+            return returnApplication;
         }else{
             jclass applicationClass = jniEnv -> GetObjectClass(application);
             jclass superClass = jniEnv ->GetSuperclass(applicationClass);
@@ -119,6 +126,7 @@ jobject environment::getApplicationContext(jobject context) {
                     auto result = jstring2string(jniEnv,get(value.c_str()));
                     if(result == jstring2string(jniEnv,superClassName)){
                         returnApplication = application;
+                        _legal = true;
                         break;
                     }
                 }
@@ -134,12 +142,11 @@ jobject environment::getApplicationContext(jobject context) {
 jstring environment::get(const char *className){
     jstring cipherString = jniEnv->NewStringUTF(className);;
     string header = string(HEADER);
-    string class_path = "com/occ/" + header + "/AESEncryption";
+    string startPath = AY_OBFUSCATE("com/occ/").operator char *() + header;
+    string class_path =  startPath + AY_OBFUSCATE("/AESEncryption").operator char *();
     string mode = MODE;
-    if (mode == "AES") {
-        class_path = "com/occ/" + header + "/aes/AESEncryption";
-    } else if (mode == "DES") {
-        class_path = "com/occ/" + header + "/des/DESEncryption";
+     if (mode == AY_OBFUSCATE( "DES").operator char *()) {
+        class_path = startPath + AY_OBFUSCATE("/des/DESEncryption").operator char *();
     }
     jclass encrypt_clz = jniEnv->FindClass(class_path.data());
 

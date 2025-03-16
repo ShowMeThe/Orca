@@ -15,6 +15,7 @@ private:
     JNIEnv *jniEnv;
     jobject _context;
     bool _skip;
+    bool _legal = false;
     jobject getPackageInfo();
     jstring getPackageName();
     jstring get(const char *className);
@@ -25,7 +26,7 @@ public:
 
     bool checkSignature();
 
-    jobject getApplicationContext(jobject context);
+    jobject checkApplicationContext(jobject context);
 
     jobject getContext();
 

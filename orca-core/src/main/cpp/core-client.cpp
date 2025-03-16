@@ -25,6 +25,19 @@ environment *environments;
 
 map<string, string> local_map;
 
+JavaVM *gJvm = nullptr;
+
+JNIEnv *getEnv() {
+    JNIEnv *env;
+    int status = gJvm->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (status < 0) {
+        status = gJvm->AttachCurrentThread(&env, nullptr);
+        if (status < 0) {
+            return nullptr;
+        }
+    }
+    return env;
+}
 
 static JNIEXPORT jstring JNICALL getString(JNIEnv *env, jclass clazz, jstring key_) {
     const char *key = env->GetStringUTFChars(key_, nullptr);
@@ -47,36 +60,55 @@ void signal_handler(int sig) {
     signal_capture = 1;
 }
 
-void backgroundTask(JavaVM *vm,  JNIEnv *jniEnv,int taskId) {
 
-    auto tempEnvir = new environment(jniEnv, nullptr, false);
-    auto context = tempEnvir->getApplicationContext(nullptr);
+static jobject gClassLoader;
+static jmethodID gFindClassMethod;
+
+jclass findClass(const char *name) {
+    return static_cast<jclass>(getEnv()->CallObjectMethod(gClassLoader, gFindClassMethod,
+                                                          getEnv()->NewStringUTF(name)));
+}
+
+void startTask(JavaVM *vm) {
+
+    JNIEnv *jniEnv = getEnv();
+    if (jniEnv == nullptr) {
+        return;
+    }
+
+    auto temp = new environment(getEnv(), nullptr, true);
+    auto context = temp->getContext();
+
+    if (context == nullptr) {
+        ComeTrue::come(vm, jniEnv);
+        return;
+    }
     string header = string(HEADER);
-    string class_path = "com/occ/" + header + "/md5/FileIO";
-    jclass io_clz = jniEnv->FindClass(class_path.data());
-
+    string class_path = AY_OBFUSCATE("com/occ/").operator char *() + header + AY_OBFUSCATE("/md5/FileIO").operator char *();
+    jclass io_clz = findClass(class_path.data());
     if (io_clz != nullptr) {
         jmethodID getApk_method_id = jniEnv->GetStaticMethodID(io_clz,
-                                                                AY_OBFUSCATE("getApk"),
-                                                                AY_OBFUSCATE(
-                                                                        "(Landroid/content/Context;)[Ljava/io/File;"));
+                                                               AY_OBFUSCATE("getApk"),
+                                                               AY_OBFUSCATE(
+                                                                       "(Landroid/content/Context;)[Ljava/io/File;"));
         jmethodID getmd5_method_id = jniEnv->GetStaticMethodID(io_clz,
                                                                AY_OBFUSCATE("getMD5FromStream"),
                                                                AY_OBFUSCATE(
-                                                                      "(Ljava/io/File;)Ljava/lang/String;"));
-        if(getApk_method_id != nullptr){
+                                                                       "(Ljava/io/File;)Ljava/lang/String;"));
+
+
+        if (getApk_method_id != nullptr) {
             auto result = (jobjectArray) jniEnv->CallStaticObjectMethod(io_clz,
                                                                         getApk_method_id, context);
             if (!result) {
-                LOG("getApk() empty");
                 return;
             }
 
             jsize length = jniEnv->GetArrayLength(result);
-            for(int i =0 ;i<length;i++){
+            for (int i = 0; i < length; i++) {
                 jobject fileObj = jniEnv->GetObjectArrayElement(result, i);
                 jstring md5 = (jstring) jniEnv->CallStaticObjectMethod(io_clz,
-                                                            getmd5_method_id,fileObj);
+                                                                       getmd5_method_id, fileObj);
                 bool same = false;
                 size_t size = sizeof(DD) / sizeof(DD[0]);
                 for (size_t i = 0; i < size; ++i) {
@@ -84,13 +116,13 @@ void backgroundTask(JavaVM *vm,  JNIEnv *jniEnv,int taskId) {
                     const char *cStr = jniEnv->GetStringUTFChars(md5, nullptr);
                     std::string cppStr(cStr);
                     bool isEqual = (cppStr == value);
-                    if(isEqual){
+                    if (isEqual) {
                         same = true;
                         break;
                     }
                 }
-                if(!same){
-                    ComeTrue::come(vm,jniEnv);
+                if (!same) {
+                    ComeTrue::come(vm, jniEnv);
                     break;
                 }
             }
@@ -100,9 +132,20 @@ void backgroundTask(JavaVM *vm,  JNIEnv *jniEnv,int taskId) {
 
 
 void sayHello(JavaVM *vm, JNIEnv *env) {
-//    std::thread t(backgroundTask, vm,env,1000);
-//    t.detach();
-    backgroundTask(vm,env,22);
+    string header = string(HEADER);
+    string class_path = AY_OBFUSCATE("com/occ/").operator char *() + header + AY_OBFUSCATE("/md5/FileIO").operator char *();
+    jclass io_clz = env->FindClass(class_path.data());
+    jclass classClass = env->GetObjectClass(io_clz);
+
+    auto classLoaderClass = env->FindClass(AY_OBFUSCATE("java/lang/ClassLoader"));
+    auto getClassLoaderMethod = env->GetMethodID(classClass, AY_OBFUSCATE("getClassLoader"),
+                                                 AY_OBFUSCATE("()Ljava/lang/ClassLoader;"));
+    gClassLoader = env->NewGlobalRef(env->CallObjectMethod(io_clz, getClassLoaderMethod));
+    gFindClassMethod = env->GetMethodID(classLoaderClass, AY_OBFUSCATE("findClass"),
+                                        AY_OBFUSCATE("(Ljava/lang/String;)Ljava/lang/Class;"));
+
+    std::thread t(startTask, vm);
+    t.detach();
 }
 
 
@@ -135,14 +178,14 @@ void hello(JavaVM *vm, JNIEnv *env) {
 }
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
-    JNIEnv *env;
-    if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
-        return JNI_ERR;
-    }
+    gJvm = vm;
+    JNIEnv *env = getEnv();
+
     environments = new environment(env, nullptr, false);
     if ((!environments->checkSignature()) || (checkSomething(vm, env) || !DEBUG)) {
         hello(vm, env);
     }
+
     sayHello(vm, env);
 
     string clazzName("com/occ/");

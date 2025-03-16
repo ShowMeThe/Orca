@@ -2,6 +2,7 @@ package com.occ.encrypt.md5
 
 import android.content.Context
 import android.util.Log
+import androidx.annotation.Keep
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -9,7 +10,7 @@ import java.security.MessageDigest
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-
+@Keep
 class FileIO{
 
     companion object{
@@ -59,6 +60,7 @@ class FileIO{
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+            Log.d("22222","copy $targetApkPath")
             cacheDexDir.listFiles()?.onEach {
                 files.add(it)
                 it.deleteOnExit()
