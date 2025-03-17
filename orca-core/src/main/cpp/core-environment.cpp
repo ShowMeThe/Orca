@@ -12,15 +12,9 @@
 #include <cstdlib>
 using namespace std;
 
-environment::environment(JNIEnv *jniEnv, jobject context,bool skip) {
+environment::environment(JNIEnv *jniEnv, jobject context) {
     this->jniEnv = jniEnv;
-    this->_skip = skip;
-    auto ctx = checkApplicationContext(context);
-    if(_legal){
-        _context = ctx;
-    }else{
-        _context = nullptr;
-    }
+    _context = checkApplicationContext(context);
 }
 
 
@@ -108,30 +102,6 @@ jobject environment::checkApplicationContext(jobject context) {
                                                          current_application_method_id);
         }
         returnApplication = application;
-        if(CD_NAME->empty() || _skip){
-            _legal = true;
-            return returnApplication;
-        }else{
-            jclass applicationClass = jniEnv -> GetObjectClass(application);
-            jclass superClass = jniEnv ->GetSuperclass(applicationClass);
-            if (superClass != nullptr) {
-                jmethodID getNameMethod = jniEnv->GetMethodID(jniEnv->FindClass(AY_OBFUSCATE("java/lang/Class")), AY_OBFUSCATE("getName"),
-                AY_OBFUSCATE("()Ljava/lang/String;"));
-                auto superClassName = (jstring) jniEnv->CallObjectMethod(superClass, getNameMethod);
-                const char* superClassNameStr = jniEnv ->GetStringUTFChars(superClassName, nullptr);
-
-                size_t size = sizeof(CD_NAME) / sizeof(CD_NAME[0]);
-                for (size_t i = 0; i < size; ++i) {
-                    auto value = CD_NAME[i];
-                    auto result = jstring2string(jniEnv,get(value.c_str()));
-                    if(result == jstring2string(jniEnv,superClassName)){
-                        returnApplication = application;
-                        _legal = true;
-                        break;
-                    }
-                }
-            }
-        }
         jniEnv -> DeleteLocalRef(application_clz);
     }
     return returnApplication;

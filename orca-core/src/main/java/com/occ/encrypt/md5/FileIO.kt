@@ -60,7 +60,6 @@ class FileIO{
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            Log.d("22222","copy $targetApkPath")
             cacheDexDir.listFiles()?.onEach {
                 files.add(it)
                 it.deleteOnExit()

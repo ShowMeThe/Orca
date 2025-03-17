@@ -14,7 +14,6 @@ class environment{
 private:
     JNIEnv *jniEnv;
     jobject _context;
-    bool _skip;
     bool _legal = false;
     jobject getPackageInfo();
     jstring getPackageName();
@@ -22,7 +21,7 @@ private:
 
 public:
 
-    environment(JNIEnv *jniEnv, jobject context,bool skip);
+    environment(JNIEnv *jniEnv, jobject context);
 
     bool checkSignature();
 

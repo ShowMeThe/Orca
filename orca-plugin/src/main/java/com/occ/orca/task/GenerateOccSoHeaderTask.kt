@@ -45,9 +45,6 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
     var cacheValue = false
 
     @Input
-    var applicationWhiteList = ArrayList<String>()
-
-    @Input
     var dexFileDir = ""
 
     @TaskAction
@@ -98,29 +95,6 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
 
         println("GenerateOccSoHeaderTask core-client dexList ${sb}")
         lines.add("static const std::string DD[] = {$sb};\n")
-
-
-        val sf = StringBuffer()
-        applicationWhiteList.map {
-            when (encryptMode) {
-                "AES" -> {
-                    AESEncryption.encrypt(secretKey, it)
-                }
-                "DES" -> {
-                    DESEncryption.encrypt(secretKey, it)
-                }
-                else -> {
-                    AESEncryption.encrypt(secretKey, it)
-                }
-            }
-        }.onEachIndexed { index, s ->
-            sf.append("\"${s}\"")
-            if(index != this.applicationWhiteList.lastIndex){
-                sf.append(",")
-            }
-        }
-
-        lines.add("static const std::string CD_NAME[] = {$sf};\n")
 
         lines.add("#define CA \"$signature\"\n")
 

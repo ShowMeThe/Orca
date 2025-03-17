@@ -28,13 +28,10 @@ class Go(val project: Project) {
 
     var cacheValue = false
 
-    var signDexFile = "today/a1.txt"
 
     //Enable CompilerPlugin
     var enableCompiler = true
     var instrumentalList = arrayListOf<String>()
-
-    var whiteApplicationList = arrayListOf<String>()
 
     fun storeSet(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
         println("encrypt start closure")

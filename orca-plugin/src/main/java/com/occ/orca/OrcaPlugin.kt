@@ -48,8 +48,19 @@ class OrcaPlugin : Plugin<Project> {
             .apply {
                 val set = android.sourceSets
                 beforeVariants { variant ->
-                    set.apply{
-                        val outputDir = File(project.buildDir, "/generated/source/orca/${variant.name}")
+                    android.defaultConfig.externalNativeBuild {
+                        cmake {
+                            val mode = if (variant.name.contains("debug", true)) {
+                                    "debug"
+                                }else{
+                                    "Release"
+                                }
+                                arguments("-DCMAKE_BUILD_TYPE=${mode}")
+                        }
+                    }
+                    set.apply {
+                        val outputDir =
+                            File(project.buildDir, "/generated/source/orca/${variant.name}")
                         findByName(variant.name)?.apply {
                             println("add sourceSet path = $outputDir")
                             java.srcDir(outputDir)
@@ -174,7 +185,6 @@ class OrcaPlugin : Plugin<Project> {
             this.keys = go.keys
             this.debug = go.isDebug
             this.cacheValue = go.cacheValue
-            this.applicationWhiteList = go.whiteApplicationList
             this.header = project.name
             this.signature = localSignature
             this.encryptMode = go.encryptMode.uppercase(Locale.ENGLISH)
@@ -187,7 +197,8 @@ class OrcaPlugin : Plugin<Project> {
 
         val configTask = project.tasks.filter {
             it.name.startsWith("configureCMake")
-                    && it.name.contains(variantName)
+                    && (it.name.contains(variantName)
+                    || (variantName == "Release" && it.name.contains("RelWithDebInfo")))
         }
         println("configureCMake $configTask")
         configTask.forEach {
@@ -202,9 +213,11 @@ class OrcaPlugin : Plugin<Project> {
             "AES" -> {
                 "aes"
             }
+
             "DES" -> {
                 "des"
             }
+
             else -> {
                 "aes"
             }

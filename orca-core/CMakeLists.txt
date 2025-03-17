@@ -1,6 +1,6 @@
 
 cmake_minimum_required(VERSION 3.4.1)
-
+set(CMAKE_CONFIGURATION_TYPES Release)
 add_library(
         core-client
 

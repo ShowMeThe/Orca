@@ -19,6 +19,7 @@ class GenerateCMakeLists(val project: Project) {
         val lines =  ArrayList<String>()
 
         lines.add("cmake_minimum_required(VERSION 3.4.1)\n")
+        lines.add("set(CMAKE_CONFIGURATION_TYPES Release)\n")
         lines.add("add_library(\n" +
                 "        $libName\n" +
                 "\n" +
