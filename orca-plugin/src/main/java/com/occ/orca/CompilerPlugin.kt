@@ -17,8 +17,8 @@ class CompilerPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.extensions.getByType(AndroidComponentsExtension::class.java).apply {
             this.onVariants { variant ->
-                val go = (project.extensions.findByName("Orca") as Orca).go
-                if (go.enableCompiler) {
+                val go = (project.extensions.findByName("Orca") as? Orca)?.go
+                if (go?.enableCompiler == true) {
                     variant.instrumentation.transformClassesWith(
                         ClassVisitorFactory::class.java,
                         InstrumentationScope.PROJECT
@@ -111,7 +111,8 @@ class CoreClassNode(private val nextVisitor: ClassVisitor, private val projectNa
         }
         val oldMethodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions)
 
-        val addInOnCreate = name.equals("onCreate")
+
+        val addInOnCreate = /*name.equals("onCreate")*/false
         val hasAnnotation = state and hasAnnotation == hasAnnotation
         val hasStatic = state and hasStatic == hasStatic
         val hasNoStatic = state and hasNoStatic == hasNoStatic

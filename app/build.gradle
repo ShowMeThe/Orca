@@ -24,8 +24,9 @@ android {
         encryptMode = "des"
         isBuildKotlin = false
         cacheValue = true
-        instrumentalList = [
-                "com.example.test.AndroidViewModel"
+        instrumentalList = []
+        checkClass = [
+            "com.example.test.MyApplication" : "onCreate"
         ]
         storeSet {
             "base" {

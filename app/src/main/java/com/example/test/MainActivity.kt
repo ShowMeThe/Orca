@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
             .get(AndroidViewModel::class.java)
     }
 
-    @CoreDecryption("base")
+    @CoreDecryption("base2")
     private var data2 = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         val tv = findViewById<View>(R.id.tv)
         tv.setOnClickListener {
             runCatching {
-                Log.e("222222","base = ${AppCore.getBase()} ${data2} ${viewModel.getValue2()}")
+                Log.e("222222","base = ${AppCore.getBase()} base2 = ${data2} base3 = ${viewModel.getValue2()}")
             }.onFailure {
                 it.printStackTrace()
             }

@@ -1,5 +1,7 @@
 package com.occ.orca
 
+import com.android.build.api.instrumentation.FramesComputationMode
+import com.android.build.api.instrumentation.InstrumentationScope
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.android.build.gradle.TestedExtension
@@ -69,6 +71,19 @@ class OrcaPlugin : Plugin<Project> {
                     }
                 }
                 onVariants { variant ->
+                    val go = (project.extensions.findByName("Orca") as? Orca)?.go
+                    val checkClass = go?.checkClass
+                    if (!checkClass.isNullOrEmpty()) {
+                        variant.instrumentation.transformClassesWith(
+                            ApplicationClassVisitorFactory::class.java,
+                            InstrumentationScope.PROJECT
+                        ) {
+                            it.projectName.set(project.name)
+                            it.classMap.set(checkClass)
+                            it.findMethodName.set("")
+                        }
+                        variant.instrumentation.setAsmFramesComputationMode(FramesComputationMode.COPY_FRAMES)
+                    }
                     project.afterEvaluate {
                         buildTask(nativeOriginPath, variant, project, android)
                     }
@@ -200,7 +215,8 @@ class OrcaPlugin : Plugin<Project> {
                     && (it.name.contains(variantName)
                     || (variantName == "Release" && it.name.contains("RelWithDebInfo")))
         }
-        println("configureCMake $configTask")
+        val findAsmTask = project.getTasksByName("transformDebugClassesWithAsm",false)
+        task.dependsOn(findAsmTask)
         configTask.forEach {
             println("configureCMake forEach ${it.name} ${task.name}")
             it.dependsOn(task)

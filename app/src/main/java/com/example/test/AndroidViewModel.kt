@@ -6,7 +6,7 @@ import com.occ.annotation.CoreDecryption
 
 class AndroidViewModel(application: Application) : AndroidViewModel(application) {
 
-    @CoreDecryption("base")
+    @CoreDecryption("base3")
     private var data2 = ""
 
     fun getValue2() = data2

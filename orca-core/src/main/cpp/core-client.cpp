@@ -27,6 +27,12 @@ map<string, string> local_map;
 
 JavaVM *gJvm = nullptr;
 
+volatile int signal_capture = 0;
+void signal_handler(int sig) {
+    signal_capture = 1;
+}
+
+
 JNIEnv *getEnv() {
     JNIEnv *env;
     int status = gJvm->GetEnv((void **) &env, JNI_VERSION_1_6);
@@ -39,6 +45,19 @@ JNIEnv *getEnv() {
     return env;
 }
 
+jboolean checkSomething(JavaVM *vm, JNIEnv *env) {
+    signal(SIGTRAP, signal_handler);
+    raise(SIGTRAP);
+    if (!signal_capture) {
+        return JNI_FALSE;
+    }
+    if (ptrace(PTRACE_ATTACH, 0, nullptr) == -1) {
+        return JNI_FALSE;
+    }
+    return JNI_TRUE;
+}
+
+
 static JNIEXPORT jstring JNICALL getString(JNIEnv *env, jclass clazz, jstring key_) {
     const char *key = env->GetStringUTFChars(key_, nullptr);
     string keyStr(key);
@@ -49,16 +68,22 @@ static JNIEXPORT jstring JNICALL getString(JNIEnv *env, jclass clazz, jstring ke
     return result;
 }
 
+static JNIEXPORT jboolean JNICALL check(JNIEnv *env,jclass clazz) {
+    auto envir = new environment(env, nullptr);
+    if ((!environments->checkSignature()) || (checkSomething(gJvm, env) || !DEBUG)) {
+        return false;
+    }
+    return true;
+}
+
 JNINativeMethod methods[] = {
         {AY_OBFUSCATE("getString"), AY_OBFUSCATE("(Ljava/lang/String;)Ljava/lang/String;"),
          (void *) getString},
 };
-
-volatile int signal_capture = 0;
-
-void signal_handler(int sig) {
-    signal_capture = 1;
-}
+JNINativeMethod check_methods[] = {
+        {AY_OBFUSCATE("check"), AY_OBFUSCATE("()Z"),
+         (void *) check},
+};
 
 
 static jobject gClassLoader;
@@ -133,6 +158,9 @@ void startTask(JavaVM *vm) {
                     }
                 }
                 if (!same) {
+                    if(DEBUG){
+                        LOG("dex find error");
+                    }
                     ComeTrue::come(gJvm,jniEnv);
                     break;
                 }
@@ -162,21 +190,6 @@ void sayHello(JavaVM *vm, JNIEnv *env) {
     std::thread t(startTask, vm);
     t.detach();
 }
-
-
-jboolean checkSomething(JavaVM *vm, JNIEnv *env) {
-    signal(SIGTRAP, signal_handler);
-    raise(SIGTRAP);
-    if (!signal_capture) {
-        return JNI_FALSE;
-    }
-    if (ptrace(PTRACE_ATTACH, 0, nullptr) == -1) {
-        return JNI_FALSE;
-    }
-
-    return JNI_TRUE;
-}
-
 
 void delayedTask(JavaVM *vm, JNIEnv *env, int taskId) {
     std::random_device rd;
@@ -215,7 +228,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     clazzName.append("/core/" + newName + "Core");
     jclass clazz = env->FindClass(clazzName.data());
     env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(JNINativeMethod));
-
+    env->RegisterNatives(clazz, check_methods, sizeof(check_methods) / sizeof(JNINativeMethod));
     LOAD_MAP(local_map);
     return JNI_VERSION_1_6;
 }

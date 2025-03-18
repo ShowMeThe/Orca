@@ -4,6 +4,7 @@ package com.occ.orca.task
 import com.occ.orca.KeyExt
 import com.occ.orca.StringUtils
 import com.squareup.javapoet.*
+import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -30,7 +31,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
     lateinit var keys: List<KeyExt>
 
     @Input
-    var buildWithKotlin : Boolean = false
+    var buildWithKotlin: Boolean = false
 
     @TaskAction
     fun generate() {
@@ -41,7 +42,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
     }
 
-    private fun getCoreClassName():String{
+    private fun getCoreClassName(): String {
         val base = "Core"
         val headName = StringUtils.substring(soHeadName.toLowerCase(Locale.getDefault()))
         return headName + base
@@ -49,12 +50,17 @@ open class GenerateJavaClientFileTask : DefaultTask() {
 
     private fun buildKotlin() {
         val classes = com.squareup.kotlinpoet.TypeSpec.objectBuilder(getCoreClassName())
-            .addAnnotation(com.squareup.kotlinpoet.ClassName("androidx.annotation","Keep"))
+            .addAnnotation(com.squareup.kotlinpoet.ClassName("androidx.annotation", "Keep"))
             .addInitializerBlock(
                 com.squareup.kotlinpoet.CodeBlock.builder()
                     .addStatement("System.loadLibrary(%S)", "${soHeadName}-core-client")
                     .build()
             )
+        val nativeCheckFunction = FunSpec.builder("check")
+            .addModifiers(KModifier.EXTERNAL)
+            .returns(Boolean::class)
+            .build()
+        classes.addFunction(nativeCheckFunction)
 
         val nativeFunction = FunSpec.builder("getString")
             .addModifiers(KModifier.EXTERNAL)
@@ -93,7 +99,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
 
     private fun buildJava() {
         val classBuilder = TypeSpec.classBuilder(getCoreClassName())
-            .addAnnotation(ClassName.get("androidx.annotation","Keep"))
+            .addAnnotation(ClassName.get("androidx.annotation", "Keep"))
             .addModifiers(Modifier.FINAL, Modifier.PUBLIC)
             .addMethod(
                 MethodSpec.constructorBuilder()
@@ -108,6 +114,12 @@ open class GenerateJavaClientFileTask : DefaultTask() {
                 .addStatement("System.loadLibrary(\"\$L\")", "${soHeadName}-core-client").build()
         )
 
+        classBuilder.addMethod(
+            MethodSpec.methodBuilder("check")
+                .addModifiers(Modifier.NATIVE, Modifier.STATIC, Modifier.PUBLIC).returns(
+                Boolean::class.java
+            ).build()
+        )
         classBuilder.addMethod(
             MethodSpec.methodBuilder("getString")
                 .addModifiers(Modifier.NATIVE, Modifier.STATIC, Modifier.PUBLIC)

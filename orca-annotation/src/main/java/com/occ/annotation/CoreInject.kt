@@ -37,6 +37,16 @@ class CoreInject private constructor(private val projectName: String) {
         }.getOrDefault(coreClazz)
     }
 
+    fun check(){
+        kotlin.runCatching {
+            val getMethod = coreInstant::class.java.getDeclaredMethod("check")
+            getMethod.isAccessible = true
+            getMethod.invoke(coreInstant)
+        }.onFailure {
+            it.printStackTrace()
+        }
+    }
+
     fun inject(any: Any) {
         any::class.java.declaredFields.forEach {
             if (it.isAnnotationPresent(CoreDecryption::class.java) && it.type == String::class.java) {

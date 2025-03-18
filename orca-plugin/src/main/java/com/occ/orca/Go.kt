@@ -28,6 +28,7 @@ class Go(val project: Project) {
 
     var cacheValue = false
 
+    var checkClass : Map<String,String> = HashMap()
 
     //Enable CompilerPlugin
     var enableCompiler = true

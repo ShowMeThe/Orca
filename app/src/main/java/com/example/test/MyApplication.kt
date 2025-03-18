@@ -1,22 +1,14 @@
-package com.example.test;
+package com.example.test
 
-import android.app.Application;
-
-public class MyApplication extends NextApplication {
-
-
-    static {
-        run2();
+class MyApplication : NextApplication() {
+    companion object {
+        init {
+            run2()
+        }
+        private fun run2() {}
     }
 
-    private static void run2(){
-
+    override fun onCreate() {
+        super.onCreate()
     }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
-
 }
