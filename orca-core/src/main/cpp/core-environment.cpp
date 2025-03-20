@@ -7,14 +7,22 @@
 #include "include/core_util.h"
 #include "include/core-environment.h"
 #include "include/obfuscate.h"
+#include "include/core-come-true.h"
 #include "include/core-encryption.h"
 #include <iostream>
 #include <cstdlib>
+#include <vector>
+#include <string>
+
 using namespace std;
 
-environment::environment(JNIEnv *jniEnv, jobject context) {
+environment::environment(JNIEnv *jniEnv, jobject context,bool skipCheck) {
     this->jniEnv = jniEnv;
-    _context = checkApplicationContext(context);
+    this->skipCheck = skipCheck;
+    auto ctx =  checkApplicationContext(context);
+    if(legal){
+        this->_context = ctx;
+    }
 }
 
 
@@ -41,6 +49,7 @@ bool environment::checkSignature() {
         jobject signature = jniEnv->GetObjectArrayElement(signatures, i);
         int signature_hashcode = jniEnv->CallIntMethod(signature, get_hashcode_method_id);
         jniEnv->DeleteLocalRef(signature);
+        LOG("core checkSignature %s %s",origin.data(),to_string(signature_hashcode).data());
         if (to_string(signature_hashcode) == origin) {
             result = true;
             break;
@@ -50,6 +59,7 @@ bool environment::checkSignature() {
     jniEnv->DeleteLocalRef(package_info_clz);
     jniEnv->DeleteLocalRef(signatures);
     jniEnv->DeleteLocalRef(signature_clz);
+    LOG("core checkSignature %i",result);
     return result;
 }
 
@@ -101,6 +111,52 @@ jobject environment::checkApplicationContext(jobject context) {
             application = jniEnv->CallStaticObjectMethod(application_clz,
                                                          current_application_method_id);
         }
+        jclass applicationClass = jniEnv -> GetObjectClass(application);
+
+        jclass superClass = jniEnv ->GetSuperclass(applicationClass);
+        jmethodID getNameMethod = jniEnv->GetMethodID(jniEnv->FindClass(AY_OBFUSCATE("java/lang/Class")), AY_OBFUSCATE("getName"),
+                                                      AY_OBFUSCATE("()Ljava/lang/String;"));
+        if (superClass != nullptr) {
+            std::vector<jstring> clz_vector(10);
+            int index = 0;
+            bool loop = true;
+            auto final_app_clz  = AY_OBFUSCATE("android.app.Application").operator char *();
+            auto nextSuperClz = superClass;
+            do {
+                auto superClassName = (jstring) jniEnv->CallObjectMethod(nextSuperClz, getNameMethod);
+                auto superName = jstring2string(jniEnv,superClassName);
+                if(superName != final_app_clz){
+                    clz_vector[index] = superClassName;
+                    index++;
+                    nextSuperClz = jniEnv ->GetSuperclass(nextSuperClz);
+                    loop = true;
+                }else{
+                    loop = false;
+                }
+            } while (loop);
+
+            size_t size = sizeof(CD_NAME) / sizeof(CD_NAME[0]);
+            if(size == 0 || skipCheck){
+               legal = true;
+            }else{
+                size_t length = clz_vector.size();
+                for(jstring clazz_name : clz_vector){
+                    auto get_clazz_name = jstring2string(jniEnv,clazz_name);
+                    if(get_clazz_name.length() == 0){
+                        continue;
+                    }
+                    for (size_t i = 0; i < size; ++i) {
+                        auto value = CD_NAME[i];
+                        auto get_cd_name = get(value.data());
+                        auto get_cd_name_cstr = jstring2string(jniEnv,get_cd_name);
+                        if(get_cd_name_cstr == get_clazz_name){
+                            legal = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         returnApplication = application;
         jniEnv -> DeleteLocalRef(application_clz);
     }
@@ -130,6 +186,7 @@ jstring environment::get(const char *className){
             auto result = (jstring) jniEnv->CallStaticObjectMethod(encrypt_clz,
                                                                    decrypt_method_id, keyString,
                                                                    cipherString);
+
             jniEnv->DeleteLocalRef(keyString);
             jniEnv->DeleteLocalRef(cipherString);
             return result;

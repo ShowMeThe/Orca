@@ -155,20 +155,19 @@ class OrcaPlugin : Plugin<Project> {
 
     private fun checkFileExist(project: Project, nativeOriginPath: Any?) {
         val file = File(project.buildDir, "orca.so")
-        val fileLists = file.listFiles()
-        val isFileAllExist = fileLists.isNullOrEmpty() && fileLists.checkFilesNameExist()
-        println("checkFileExist before task = $isFileAllExist nativeOriginPath = $nativeOriginPath")
+        val fileLists = file.walkTopDown().toMutableList().filter { it.isFile }
+        val isFileAllExist = fileLists.isEmpty() && fileLists.checkFilesNameExist()
+        println("checkFileExist before isFileAllExist = $isFileAllExist nativeOriginPath = $nativeOriginPath")
         if (isFileAllExist.not()) {
             project.copy {
                 from(nativeOriginPath)
                 include("src/main/cpp/**")
                 into(file)
             }
-            println("checkFileExist before task = $isFileAllExist nativeOriginPath = $nativeOriginPath")
         }
     }
 
-    private fun Array<File>?.checkFilesNameExist(): Boolean {
+    private fun List<File>?.checkFilesNameExist(): Boolean {
         return this?.all { checkFiles.contains(it.name) } == true
     }
 
@@ -200,6 +199,8 @@ class OrcaPlugin : Plugin<Project> {
             this.keys = go.keys
             this.debug = go.isDebug
             this.cacheValue = go.cacheValue
+            this.applicationWhiteList = go.applicationWhiteList
+            this.enableDexCheck = go.enableDexCheck
             this.header = project.name
             this.signature = localSignature
             this.encryptMode = go.encryptMode.uppercase(Locale.ENGLISH)
@@ -215,7 +216,7 @@ class OrcaPlugin : Plugin<Project> {
                     && (it.name.contains(variantName)
                     || (variantName == "Release" && it.name.contains("RelWithDebInfo")))
         }
-        val findAsmTask = project.getTasksByName("transformDebugClassesWithAsm",false)
+        val findAsmTask = project.getTasksByName("mergeProjectDex${variantName}",false)
         task.dependsOn(findAsmTask)
         configTask.forEach {
             println("configureCMake forEach ${it.name} ${task.name}")

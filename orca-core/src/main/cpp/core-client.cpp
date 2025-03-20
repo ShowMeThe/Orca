@@ -18,6 +18,7 @@
 #include <sys/ptrace.h>
 #include <unistd.h>
 #include "include/obfuscate.h"
+#include <fstream>
 
 using namespace std;
 
@@ -25,7 +26,7 @@ environment *environments;
 
 map<string, string> local_map;
 
-JavaVM *gJvm = nullptr;
+static JavaVM *gJvm = nullptr;
 
 volatile int signal_capture = 0;
 void signal_handler(int sig) {
@@ -49,9 +50,11 @@ jboolean checkSomething(JavaVM *vm, JNIEnv *env) {
     signal(SIGTRAP, signal_handler);
     raise(SIGTRAP);
     if (!signal_capture) {
+        LOG("core in debug signal");
         return JNI_FALSE;
     }
     if (ptrace(PTRACE_ATTACH, 0, nullptr) == -1) {
+        LOG("core in debug");
         return JNI_FALSE;
     }
     return JNI_TRUE;
@@ -69,8 +72,8 @@ static JNIEXPORT jstring JNICALL getString(JNIEnv *env, jclass clazz, jstring ke
 }
 
 static JNIEXPORT jboolean JNICALL check(JNIEnv *env,jclass clazz) {
-    auto envir = new environment(env, nullptr);
-    if ((!environments->checkSignature()) || (checkSomething(gJvm, env) || !DEBUG)) {
+    auto envir = new environment(env, nullptr,false);
+    if ((!envir->checkSignature()) /*|| (!checkSomething(gJvm, env) || !DEBUG)*/) {
         return false;
     }
     return true;
@@ -109,6 +112,51 @@ void files_delete(JNIEnv *jniEnv,jobjectArray array){
     }
 }
 
+bool isXposedClassLoaded(JNIEnv* env) {
+    jclass xposedClass = env->FindClass(AY_OBFUSCATE("de/robv/android/xposed/XposedBridge"));
+    if (xposedClass != nullptr) {
+        env->DeleteLocalRef(xposedClass);
+        return true;
+    }
+    return false;
+}
+
+bool isXposedLoaded() {
+    std::ifstream maps(AY_OBFUSCATE("/proc/self/maps"));
+    std::string line;
+    while (std::getline(maps, line)) {
+        if (line.find(AY_OBFUSCATE("XposedBridge.jar")) != std::string::npos ||
+            line.find(AY_OBFUSCATE("libxposed.so")) != std::string::npos) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isXposedPropertySet() {
+    const char* prop = std::getenv(AY_OBFUSCATE("persist.sys.dalvik.vm.lib"));
+    if (prop != nullptr && std::string(prop).find(AY_OBFUSCATE("xposed")) != std::string::npos) {
+        return true;
+    }
+    return false;
+}
+
+bool isXposedInstallerPresent() {
+    FILE* fp = popen(AY_OBFUSCATE("pm list packages"), "r");
+    if (fp == nullptr) {
+        return false;
+    }
+    char buffer[128];
+    while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
+        if (strstr(buffer, AY_OBFUSCATE("de.robv.android.xposed.installer")) != nullptr) {
+            pclose(fp);
+            return true;
+        }
+    }
+    pclose(fp);
+    return false;
+}
+
 void startTask(JavaVM *vm) {
 
     JNIEnv *jniEnv = getEnv();
@@ -116,7 +164,12 @@ void startTask(JavaVM *vm) {
         return;
     }
 
-    auto temp = new environment(getEnv(), nullptr);
+    if(isXposedInstallerPresent() || isXposedPropertySet() || isXposedClassLoaded(jniEnv) || isXposedLoaded()){
+        ComeTrue::come(gJvm,jniEnv);
+        return;
+    }
+
+    auto temp = new environment(getEnv(), nullptr, true);
     auto context = temp->getContext();
 
     if (context == nullptr) {
@@ -149,8 +202,7 @@ void startTask(JavaVM *vm) {
                 size_t size = sizeof(DD) / sizeof(DD[0]);
                 for (size_t i = 0; i < size; ++i) {
                     auto value = DD[i];
-                    const char *cStr = jniEnv->GetStringUTFChars(md5, nullptr);
-                    std::string md5Str(cStr);
+                    auto md5Str = jstring2string(jniEnv,md5);
                     bool isEqual = (md5Str == value);
                     if (isEqual) {
                         same = true;
@@ -158,9 +210,7 @@ void startTask(JavaVM *vm) {
                     }
                 }
                 if (!same) {
-                    if(DEBUG){
-                        LOG("dex find error");
-                    }
+                    LOG("core dex find not same");
                     ComeTrue::come(gJvm,jniEnv);
                     break;
                 }
@@ -209,15 +259,15 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     gJvm = vm;
     JNIEnv *env = getEnv();
 
-    environments = new environment(env, nullptr);
-    if ((!environments->checkSignature()) || (checkSomething(vm, env) || !DEBUG)) {
-        LOG("failed check");
-        hello(vm, env);
+    environments = new environment(env, nullptr, false);
+    if ((!environments->checkSignature()) /*|| (!checkSomething(vm, env) || !DEBUG)*/) {
+        LOG("core failed check");
+       // hello(vm, env);
     }
 
     sayHello(vm, env);
 
-    string clazzName("com/occ/");
+    string clazzName(AY_OBFUSCATE("com/occ/"));
     clazzName.append(HEADER);
     char chars[] = HEADER;
     char first = chars[0];
@@ -225,7 +275,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         chars[0] -= 32;
     }
     string newName = string(chars);
-    clazzName.append("/core/" + newName + "Core");
+    clazzName.append(AY_OBFUSCATE("/core/").operator char *() + newName + AY_OBFUSCATE("Core").operator char *());
     jclass clazz = env->FindClass(clazzName.data());
     env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(JNINativeMethod));
     env->RegisterNatives(clazz, check_methods, sizeof(check_methods) / sizeof(JNINativeMethod));

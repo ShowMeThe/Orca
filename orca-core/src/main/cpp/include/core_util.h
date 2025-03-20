@@ -16,11 +16,16 @@ using namespace std;
 
 
 
-static std::string jstring2string(JNIEnv* env, jstring jstr) {
-    char* chars = (char *) env->GetStringChars(jstr, nullptr);
-    auto size = env->GetStringLength(jstr);
+static std::string jstring2string(JNIEnv* env, jstring jStr) {
+//    if (!jStr) return "";
+//    jsize len = env->GetStringUTFLength(jStr);
+//    std::string str(len, '\0');
+//    env->GetStringUTFRegion(jStr, 0, len, &str[0]);
+//    return str;
+    if (!jStr) return "";
+    const char *chars = env->GetStringUTFChars(jStr, nullptr);
     std::string str(chars);
-    env->ReleaseStringChars(jstr, env->GetStringChars(jstr, nullptr));
+    env->ReleaseStringUTFChars(jStr, chars);
     return str;
 }
 

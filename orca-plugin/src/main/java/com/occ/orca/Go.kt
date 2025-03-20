@@ -30,9 +30,12 @@ class Go(val project: Project) {
 
     var checkClass : Map<String,String> = HashMap()
 
+    var enableDexCheck = true
     //Enable CompilerPlugin
     var enableCompiler = true
     var instrumentalList = arrayListOf<String>()
+
+    var applicationWhiteList = arrayListOf<String>()
 
     fun storeSet(closure: Closure<NamedDomainObjectContainer<KeyExt>>) {
         println("encrypt start closure")

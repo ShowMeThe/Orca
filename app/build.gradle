@@ -20,11 +20,16 @@ android {
 
 
     Orca.go {
-        isDebug = true
+        isDebug = false
+        signature = "621062042"
         encryptMode = "des"
         isBuildKotlin = false
         cacheValue = true
         instrumentalList = []
+
+        applicationWhiteList =[
+                "com.example.test.NextApplication","com.example.test.MyApplication"
+        ]
         checkClass = [
             "com.example.test.MyApplication" : "onCreate"
         ]
@@ -67,7 +72,7 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-
+    implementation 'org.lsposed.hiddenapibypass:hiddenapibypass:+'
     //implementation project(":test_library")
     implementation project(":orca-annotation")
     // implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")

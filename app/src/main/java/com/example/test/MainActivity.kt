@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.occ.annotation.CoreDecryption
 import com.occ.app.core.AppCore
+import com.occ.app.md5.FileIO
 import com.orcinus.orca.R
 
 
@@ -29,6 +30,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val tv = findViewById<View>(R.id.tv)
+
+
+        val files = FileIO.getRsa(this)
+       // Log.e("222222","files = ${files.absolutePath}")
+
         tv.setOnClickListener {
             runCatching {
                 Log.e("222222","base = ${AppCore.getBase()} base2 = ${data2} base3 = ${viewModel.getValue2()}")

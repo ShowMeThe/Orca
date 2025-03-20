@@ -49,7 +49,7 @@ class FileIO{
                 var entry: ZipEntry?
 
                 while (zipInputStream.nextEntry.also { entry = it } != null) {
-                    if (entry!!.name.startsWith("classes") && entry!!.name.endsWith(".dex")) {
+                    if ((entry!!.name.startsWith("classes") && entry!!.name.endsWith(".dex"))) {
                         val outputFile = File(cacheDexDir, entry!!.name)
                         FileOutputStream(outputFile).use { fos ->
                             zipInputStream.copyTo(fos)
@@ -66,6 +66,7 @@ class FileIO{
             }
          return files.toTypedArray()
         }
+
     }
 
 }

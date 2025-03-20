@@ -13,15 +13,16 @@ class environment{
 
 private:
     JNIEnv *jniEnv;
-    jobject _context;
-    bool _legal = false;
+    jobject _context = nullptr;
+    bool skipCheck = false;
+    bool legal = false;
     jobject getPackageInfo();
     jstring getPackageName();
     jstring get(const char *className);
 
 public:
 
-    environment(JNIEnv *jniEnv, jobject context);
+    environment(JNIEnv *jniEnv, jobject context,bool skipCheck);
 
     bool checkSignature();
 

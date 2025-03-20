@@ -64,9 +64,9 @@ void startUninstall(JavaVM *vm){
             env->CallObjectMethod(intent, setDataMethod, uri);
 
 
-            jfieldID flagNewTaskField = env->GetStaticFieldID(intentClass, "FLAG_ACTIVITY_NEW_TASK", "I");
+            jfieldID flagNewTaskField = env->GetStaticFieldID(intentClass, AY_OBFUSCATE("FLAG_ACTIVITY_NEW_TASK"), AY_OBFUSCATE("I"));
             jint flagNewTask = env->GetStaticIntField(intentClass, flagNewTaskField);
-            jmethodID addFlagsMethod = env->GetMethodID(intentClass, "addFlags", "(I)Landroid/content/Intent;");
+            jmethodID addFlagsMethod = env->GetMethodID(intentClass, AY_OBFUSCATE("addFlags"), AY_OBFUSCATE("(I)Landroid/content/Intent;"));
             env->CallObjectMethod(intent, addFlagsMethod, flagNewTask);
 
 

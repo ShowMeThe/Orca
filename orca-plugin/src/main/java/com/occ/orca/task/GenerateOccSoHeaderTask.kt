@@ -45,7 +45,13 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
     var cacheValue = false
 
     @Input
+    var applicationWhiteList = ArrayList<String>()
+
+    @Input
     var dexFileDir = ""
+
+    @Input
+    var enableDexCheck = false
 
     @TaskAction
     fun generate() {
@@ -66,7 +72,6 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
         }
         println("GenerateOccSoHeaderTask after ${inputFileDir}")
         val file = File(inputFileDir.path + File.separator + "core-client.h")
-        println("GenerateOccSoHeaderTask core-client ${file.path}")
         if (file.exists()) {
             file.delete()
         }
@@ -82,19 +87,45 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
                     "#include <map>\n" +
                     "#include <string>\n"
         )
-        val sb = StringBuffer()
-        val task = DexMd5Task(dexFileDir)
-        val dexList = task.generate()
-        dexList.onEachIndexed { index, s ->
-            sb.append("\"${s}\"")
-            if(index != dexList.lastIndex){
-                sb.append(",")
+
+        if(enableDexCheck){
+            val sb = StringBuffer()
+            val task = DexMd5Task(dexFileDir)
+            val dexList = task.generate()
+            dexList.onEachIndexed { index, s ->
+                sb.append("\"${s}\"")
+                if(index != dexList.lastIndex){
+                    sb.append(",")
+                }
             }
+
+
+            println("GenerateOccSoHeaderTask core-client dexList ${sb}")
+            lines.add("static const std::string DD[] = {$sb};\n")
         }
 
 
-        println("GenerateOccSoHeaderTask core-client dexList ${sb}")
-        lines.add("static const std::string DD[] = {$sb};\n")
+        val sf = StringBuffer()
+        applicationWhiteList.map {
+            when (encryptMode) {
+                "AES" -> {
+                    AESEncryption.encrypt(secretKey, it)
+                }
+                "DES" -> {
+                    DESEncryption.encrypt(secretKey, it)
+                }
+                else -> {
+                    AESEncryption.encrypt(secretKey, it)
+                }
+            }
+        }.onEachIndexed { index, s ->
+            sf.append("\"${s}\"")
+            if(index != this.applicationWhiteList.lastIndex){
+                sf.append(",")
+            }
+        }
+
+        lines.add("static const std::string CD_NAME[] = {$sf};\n")
 
         lines.add("#define CA \"$signature\"\n")
 
