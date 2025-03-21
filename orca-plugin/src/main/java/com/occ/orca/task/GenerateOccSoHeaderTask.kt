@@ -88,8 +88,8 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
                     "#include <string>\n"
         )
 
+        val sb = StringBuffer()
         if(enableDexCheck){
-            val sb = StringBuffer()
             val task = DexMd5Task(dexFileDir)
             val dexList = task.generate()
             dexList.onEachIndexed { index, s ->
@@ -98,11 +98,9 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
                     sb.append(",")
                 }
             }
-
-
             println("GenerateOccSoHeaderTask core-client dexList ${sb}")
-            lines.add("static const std::string DD[] = {$sb};\n")
         }
+        lines.add("static const std::string DD[] = {$sb};\n")
 
 
         val sf = StringBuffer()

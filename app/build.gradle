@@ -21,7 +21,7 @@ android {
 
     Orca.go {
         isDebug = false
-        signature = "621062042"
+        signature = "-2103629870"
         encryptMode = "des"
         isBuildKotlin = false
         cacheValue = true
@@ -49,11 +49,25 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file("./app_test.jks")
+            storePassword "123456"
+            keyAlias "key0"
+            keyPassword "123456"
+        }
+    }
 
     buildTypes {
+        debug{
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -74,6 +88,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'org.lsposed.hiddenapibypass:hiddenapibypass:+'
     //implementation project(":test_library")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2")
     implementation project(":orca-annotation")
+   // implementation project(":apkvertify")
     // implementation("com.github.ShowMeThe.Orca:orca-annotation:2.3.0")
 }

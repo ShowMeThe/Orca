@@ -216,7 +216,10 @@ class OrcaPlugin : Plugin<Project> {
                     && (it.name.contains(variantName)
                     || (variantName == "Release" && it.name.contains("RelWithDebInfo")))
         }
-        val findAsmTask = project.getTasksByName("mergeProjectDex${variantName}",false)
+        var findAsmTask =  project.getTasksByName("mergeProjectDex${variantName}",false)
+        if(findAsmTask.isEmpty()){
+            findAsmTask = project.getTasksByName("mergeDex${variantName}",false)
+        }
         task.dependsOn(findAsmTask)
         configTask.forEach {
             println("configureCMake forEach ${it.name} ${task.name}")

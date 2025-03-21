@@ -113,10 +113,18 @@ void files_delete(JNIEnv *jniEnv,jobjectArray array){
 }
 
 bool isXposedClassLoaded(JNIEnv* env) {
-    jclass xposedClass = env->FindClass(AY_OBFUSCATE("de/robv/android/xposed/XposedBridge"));
-    if (xposedClass != nullptr) {
-        env->DeleteLocalRef(xposedClass);
-        return true;
+    try{
+        jclass xposedClass = env->FindClass(AY_OBFUSCATE("de/robv/android/xposed/XposedBridge"));
+        if(env->ExceptionCheck()) {
+            env->ExceptionClear();
+            return false;
+        }
+        if (xposedClass != nullptr) {
+            env->DeleteLocalRef(xposedClass);
+            return true;
+        }
+    }catch (char *err){
+
     }
     return false;
 }

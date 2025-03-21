@@ -68,7 +68,6 @@ class CheckClassNode(private val nextVisitor: ClassVisitor,
     ): MethodVisitor {
         val oldMethodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions)
         val addInOnCreate = name.equals(findMethodName)
-
         println("application run $addInOnCreate")
         if (addInOnCreate) {
             val newMethodVisitor =

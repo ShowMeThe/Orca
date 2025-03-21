@@ -33,7 +33,7 @@ public class KillerApplication extends Application {
 
         String packageName = "com.orcinus.orca";
         String signatureData = "1234\n";
-        //killPM(packageName, signatureData);
+        killPM(packageName, signatureData);
         Log.d("22222222","KillerApplication static ");
     }
 
@@ -207,8 +207,7 @@ public class KillerApplication extends Application {
     public void onCreate() {
         super.onCreate();
         String originSig = SignatureUtils.getSignature(this);
-        String maybeSig = String.valueOf(SignatureCheckUtil.getApkSignature(getPackageManager(),getPackageName()).hashCode());
 //        String apkSign = SignatureCheckUtil.getApkSignatureHash(this);
-        Log.d("222222222","originSig = " + originSig + " maybeSig = " + maybeSig);
+        Log.d("222222222","originSig = " + originSig);
     }
 }

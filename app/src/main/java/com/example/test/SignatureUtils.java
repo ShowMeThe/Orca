@@ -4,7 +4,17 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
+
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.util.List;
 
 public class SignatureUtils {
 
@@ -21,4 +31,8 @@ public class SignatureUtils {
         }
         return null;
     }
+
+
+
+
 }
