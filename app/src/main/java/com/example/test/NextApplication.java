@@ -14,7 +14,7 @@ import org.lsposed.hiddenapibypass.HiddenApiBypass;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class NextApplication extends KillerApplication {
+public class NextApplication extends Application {
 
 
 

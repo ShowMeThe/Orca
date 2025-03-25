@@ -20,7 +20,7 @@ android {
 
 
     Orca.go {
-        isDebug = false
+        isDebug = true
         signature = "-2103629870"
         encryptMode = "des"
         isBuildKotlin = false

@@ -33,7 +33,7 @@ public class KillerApplication extends Application {
 
         String packageName = "com.orcinus.orca";
         String signatureData = "1234\n";
-        killPM(packageName, signatureData);
+        //killPM(packageName, signatureData);
         Log.d("22222222","KillerApplication static ");
     }
 

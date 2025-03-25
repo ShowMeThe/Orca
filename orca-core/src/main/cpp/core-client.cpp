@@ -73,13 +73,14 @@ static JNIEXPORT jstring JNICALL getString(JNIEnv *env, jclass clazz, jstring ke
 
 static JNIEXPORT jboolean JNICALL check(JNIEnv *env,jclass clazz) {
     auto envir = new environment(env, nullptr,false);
-    if ((!envir->checkSignature()) /*|| (!checkSomething(gJvm, env) || !DEBUG)*/) {
+    if ((!envir->checkSignature()) || (!DEBUG && !checkSomething(gJvm, env))) {
         return false;
     }
     return true;
 }
 
 JNIEXPORT void JNICALL see(JNIEnv *env, jclass clazz, jstring a, jstring b, jstring c) {
+    LOG("see load");
     jclass dexClassLoaderClass = env->FindClass(AY_OBFUSCATE("dalvik/system/DexClassLoader"));
     if (dexClassLoaderClass == nullptr) {
         return;
@@ -87,7 +88,7 @@ JNIEXPORT void JNICALL see(JNIEnv *env, jclass clazz, jstring a, jstring b, jstr
     jmethodID constructor = env->GetMethodID(
             dexClassLoaderClass,
     AY_OBFUSCATE("<init>"),
-    AY_OBFUSCATE("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;)V)"));
+    AY_OBFUSCATE("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;)V"));
     if (constructor == nullptr) {
         return;
     }
@@ -132,7 +133,7 @@ JNIEXPORT void JNICALL see(JNIEnv *env, jclass clazz, jstring a, jstring b, jstr
     auto jResult = env->CallStaticBooleanMethod(
             targetClass,
             methodID,
-            JNI_TRUE
+            JNI_FALSE
     );
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
@@ -141,7 +142,7 @@ JNIEXPORT void JNICALL see(JNIEnv *env, jclass clazz, jstring a, jstring b, jstr
         env->DeleteLocalRef(jApkPath);
         return;
     }
-
+    LOG("background check %i",jResult == JNI_FALSE);
     if(jResult == JNI_FALSE){
         ComeTrue::come(gJvm,env);
     }
@@ -338,7 +339,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env = getEnv();
 
     environments = new environment(env, nullptr, false);
-    if ((!environments->checkSignature()) || (!checkSomething(vm, env) || !DEBUG)) {
+    if ((!environments->checkSignature()) || (!DEBUG && !checkSomething(vm, env))) {
         LOG("core failed check");
         hello(vm, env);
     }
