@@ -16,14 +16,22 @@
 
 package com.android.apksigner;
 
+import android.app.Application;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Objects;
 
 import com.android.apksig.ApkVerifier;
 
@@ -47,6 +55,7 @@ public class ApkSignerTool {
     public static final String KEY_RESULT_IS_V2_OK = "isV2OK";
     public static final String KEY_RESULT_IS_V1_OK = "isV1OK";
     public static final String KEY_RESULT_KEYSTORE_MD5 = "keystoreMd5";
+    public static final String KEY_RESULT_APP_KEYSTORE_MD5 = "appKeystoreMd5";
     //成功
     private static final int RET_OK = 0;
     //文件类型错误
@@ -82,27 +91,30 @@ public class ApkSignerTool {
 //
 //    }
 
-    private static String getBothSuccssedCheckResult(int ret, String Msg, ApkVerifier.Result result, String keystoreMD5) {
-        return "{" +
-                "\"" + KEY_RESULT_RET + "\":" + ret +
-                ",\"" + KEY_RESULT_MSG + "\":\"" + Msg +
-                "\",\"" + KEY_RESULT_IS_V1_OK + "\":" + result.isVerifiedUsingV1Scheme() +
-                ",\"" + KEY_RESULT_IS_V2 + "\":" + (result.getV2SchemeSigners().size() > 0 ? true : false) +
-                ",\"" + KEY_RESULT_IS_V2_OK + "\":" + result.isVerifiedUsingV2Scheme() +
-				",\"" + KEY_RESULT_IS_V3 + "\":" + (result.getV3SchemeSigners().size() > 0 ? true : false) +
-				",\"" + KEY_RESULT_IS_V3_OK + "\":" + result.isVerifiedUsingV3Scheme() +
-                ",\"" + KEY_RESULT_KEYSTORE_MD5 + "\":\"" + keystoreMD5 +
-                "\"" +
-                "}";
+
+
+
+    private static boolean getBothSuccssedCheckResult(int ret, String Msg, ApkVerifier.Result result, String keystoreMD5,String appKeystoreMD5) {
+        if(Msg.equals("Missing META-INF/MANIFEST.MF")
+                || !Objects.equals(keystoreMD5, appKeystoreMD5)){
+            return false;
+        }
+        return true;
     }
 
     private static String getFailedCheckResult(int ret, String Msg) {
         return "{\"" + KEY_RESULT_RET + "\":" + ret + ",\"" + KEY_RESULT_MSG + "\":\"" + Msg + "\"}";
     }
 
-    public static String verify(String apkPath, boolean showException) {
-        File inputApk = new File(apkPath);
 
+
+
+    public static boolean verify(boolean showException) {
+        String getApkPath = getApkPath(getPackageName());
+        if(getApkPath == null) return false;
+        File inputApk = new File(getApkPath);
+        long fileSizeInMB = (inputApk.length()) / (1024 * 1024);
+        if(fileSizeInMB < 1) return false;
         ApkVerifier.Builder apkVerifierBuilder = new ApkVerifier.Builder(inputApk);
         ApkVerifier apkVerifier = apkVerifierBuilder.build();
         ApkVerifier.Result result = null;
@@ -150,15 +162,99 @@ public class ApkSignerTool {
 					msg = msg + "ERROR: APK Signature Scheme v2 " + signerName + ": " + error;
 				}
 			}
+            String appKeystoreMD5 = "";
+            try {
+                PackageInfo packageInfo  = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
+                Signature[] signatures = packageInfo.signatures;
+                MessageDigest md5Digest = MessageDigest.getInstance("MD5");
+                Signature single = signatures[0];
+                appKeystoreMD5 = HexEncoding.encode(md5Digest.digest(single.toByteArray()));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
             if (result.isVerified()) {
-                return getBothSuccssedCheckResult(RET_OK, msg, result, keystoreMD5);
+                return getBothSuccssedCheckResult(RET_OK, msg, result, keystoreMD5,appKeystoreMD5);
             } else {
-                return getBothSuccssedCheckResult(RET_GET_SIG_BAD, msg,result, keystoreMD5);
+                return getBothSuccssedCheckResult(RET_GET_SIG_BAD, msg,result, keystoreMD5,appKeystoreMD5);
             }
         } else {
-            return getFailedCheckResult(RET_GET_SIG_BAD, msg);
+            return false;
         }
     }
+
+
+    private static String getApkPath(String packageName) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("/proc/self/maps"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] arr = line.split("\\s+");
+                String path = arr[arr.length - 1];
+                if (isApkPath(packageName, path)) {
+                    return path;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isApkPath(String packageName, String path) {
+        if (!path.startsWith("/") || !path.endsWith(".apk")) {
+            return false;
+        }
+        String[] splitStr = path.substring(1).split("/", 6);
+        int splitCount = splitStr.length;
+        if (splitCount == 4 || splitCount == 5) {
+            if (splitStr[0].equals("data") && splitStr[1].equals("app") && splitStr[splitCount - 1].equals("base.apk")) {
+                return splitStr[splitCount - 2].startsWith(packageName);
+            }
+            if (splitStr[0].equals("mnt") && splitStr[1].equals("asec") && splitStr[splitCount - 1].equals("pkg.apk")) {
+                return splitStr[splitCount - 2].startsWith(packageName);
+            }
+        } else if (splitCount == 3) {
+            if (splitStr[0].equals("data") && splitStr[1].equals("app")) {
+                return splitStr[2].startsWith(packageName);
+            }
+        } else if (splitCount == 6) {
+            if (splitStr[0].equals("mnt") && splitStr[1].equals("expand") && splitStr[3].equals("app") && splitStr[5].equals("base.apk")) {
+                return splitStr[4].endsWith(packageName);
+            }
+        }
+        return false;
+    }
+
+
+    private static String getPackageName(){
+        Application application = getApplication();
+        if(application != null){
+            return application.getPackageName();
+        }else return null;
+    }
+
+    private static PackageManager getPackageManager(){
+        Application application = getApplication();
+        if(application != null){
+            return application.getPackageManager();
+        }else return null;
+    }
+
+    private static Application getApplication(){
+        try {
+            Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
+            Method currentApplicationMethod = activityThreadClass.getDeclaredMethod("currentApplication");
+            Object application = currentApplicationMethod.invoke(null);
+            if (application instanceof Application) {
+                return (Application) application;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
     private static void printUsage(String page) {
         try (BufferedReader in =

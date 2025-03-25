@@ -11,7 +11,7 @@ fun getMd5Signature(packageName: String, packageManager: PackageManager): String
         val packageInfo: PackageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
         val signatures = packageInfo.signatures
         val md5Digest = MessageDigest.getInstance("MD5")
-        HexEncoding.encode(signatures.firstOrNull()?.toByteArray()?.let { md5Digest.digest(it) })
+        HexEncoding.encode(signatures.first().toByteArray().let { md5Digest.digest(it) })
     } catch (e: PackageManager.NameNotFoundException) {
         e.printStackTrace()
         null

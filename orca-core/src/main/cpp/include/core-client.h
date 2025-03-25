@@ -18,8 +18,6 @@ static const std::string CD_NAME[] = {};
 
 #define CA ""
 
-#define HEADER ""
-
 #define QA ""
 
 #define MODE "AES"

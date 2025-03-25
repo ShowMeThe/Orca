@@ -27,9 +27,6 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
     var signature = ""
 
     @Input
-    var header = ""
-
-    @Input
     var debug = false
 
     @Input
@@ -126,8 +123,6 @@ open class GenerateOccSoHeaderTask : DefaultTask() {
         lines.add("static const std::string CD_NAME[] = {$sf};\n")
 
         lines.add("#define CA \"$signature\"\n")
-
-        lines.add("#define HEADER \"$header\"\n")
 
         lines.add("#define MODE \"$encryptMode\"\n")
 

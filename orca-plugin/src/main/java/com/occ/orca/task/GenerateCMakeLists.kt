@@ -5,10 +5,10 @@ import java.io.File
 
 class GenerateCMakeLists(val project: Project) {
 
-     var libName = ""
-       set(value) {
-           field = "$value-core-client"
-       }
+//     var libName = ""
+//       set(value) {
+//           field = "$value-core-client"
+//       }
 
     fun build(call:()->Unit){
         val cmakeListsDir = File(project.buildDir, "orca.so")
@@ -21,7 +21,7 @@ class GenerateCMakeLists(val project: Project) {
         lines.add("cmake_minimum_required(VERSION 3.4.1)\n")
         lines.add("set(CMAKE_CONFIGURATION_TYPES Release)\n")
         lines.add("add_library(\n" +
-                "        $libName\n" +
+                "        app-core-client\n" +
                 "\n" +
                 "        SHARED\n" +
                 "\n" +
@@ -34,7 +34,7 @@ class GenerateCMakeLists(val project: Project) {
                 "              log-lib\n" +
                 "              log )")
         lines.add("\ntarget_link_libraries(\n" +
-                "        $libName\n" +
+                "        app-core-client\n" +
                 "                     \${log-lib} )")
 
         lines.forEach {

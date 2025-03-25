@@ -167,12 +167,10 @@ jobject environment::checkApplicationContext(jobject context) {
 
 jstring environment::get(const char *className){
     jstring cipherString = jniEnv->NewStringUTF(className);;
-    string header = string(HEADER);
-    string startPath = AY_OBFUSCATE("com/occ/").operator char *() + header;
-    string class_path =  startPath + AY_OBFUSCATE("/AESEncryption").operator char *();
+    string class_path = AY_OBFUSCATE("com/occ/app/aes/AESEncryption").operator char *();
     string mode = MODE;
      if (mode == AY_OBFUSCATE( "DES").operator char *()) {
-        class_path = startPath + AY_OBFUSCATE("/des/DESEncryption").operator char *();
+        class_path = AY_OBFUSCATE("com/occ/app/des/DESEncryption").operator char *();
     }
     jclass encrypt_clz = jniEnv->FindClass(class_path.data());
 

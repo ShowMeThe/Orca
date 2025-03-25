@@ -5,14 +5,11 @@ import com.android.build.api.instrumentation.InstrumentationScope
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.android.build.gradle.TestedExtension
-import com.android.build.gradle.api.AndroidSourceSet
 import com.android.build.gradle.internal.tasks.factory.dependsOn
-import com.occ.orca.task.DexMd5Task
 import com.occ.orca.task.GenerateCMakeLists
 import com.occ.orca.task.GenerateJavaClientFileTask
 import com.occ.orca.task.GenerateOccSoHeaderTask
 import com.occ.orca.task.GenerateRewriteJavaTask
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -109,8 +106,18 @@ class OrcaPlugin : Plugin<Project> {
             into(file)
         }
 
+        val parentFile = project.buildDir.parentFile
+        parentFile.mkdirs()
+        println("parentFile = ${parentFile.absolutePath}")
+        project.copy {
+            from(nativeOriginPath)
+            include("src/main/assets/**")
+            into(parentFile)
+        }
+
+
         GenerateCMakeLists(project).apply {
-            libName = project.name
+            //libName = project.name
             val cmakeListsDir = project.buildDir.canonicalPath + File.separator + "orca.so"
             val cmakeListsPath = cmakeListsDir + File.separator + "CMakeLists.txt"
             println("GenerateCMakeLists = $cmakeListsPath")
@@ -201,7 +208,7 @@ class OrcaPlugin : Plugin<Project> {
             this.cacheValue = go.cacheValue
             this.applicationWhiteList = go.applicationWhiteList
             this.enableDexCheck = go.enableDexCheck
-            this.header = project.name
+            //this.header = project.name
             this.signature = localSignature
             this.encryptMode = go.encryptMode.uppercase(Locale.ENGLISH)
             this.inputFileDirPath = File("$cmakeListsDir/src/main/cpp/include").path
@@ -263,7 +270,6 @@ class OrcaPlugin : Plugin<Project> {
         ) {
             dirFile = File(outputDir, "src/main/java/com/occ/encrypt/${path}")
             md5File = File(outputDir, "src/main/java/com/occ/encrypt/md5")
-            soHeaderName = project.name
         }
 
         val generateJavaClientTask = project.tasks.register(
@@ -271,7 +277,6 @@ class OrcaPlugin : Plugin<Project> {
             GenerateJavaClientFileTask::class.java
         ) {
             this.keys = go.keys.toMutableList()
-            this.soHeadName = project.name
             this.outputDir = outputDir
             this.buildWithKotlin = go.isBuildKotlin
         }

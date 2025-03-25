@@ -147,12 +147,12 @@ class CoreClassNode(private val nextVisitor: ClassVisitor, private val projectNa
                             "Companion",
                             "Lcom/occ/annotation/CoreInject\$Companion;"
                         )
-                        mv.visitLdcInsn(projectName)
+                        //mv.visitLdcInsn(projectName)
                         mv.visitMethodInsn(
                             INVOKEVIRTUAL,
                             "com/occ/annotation/CoreInject\$Companion",
                             "getInstant",
-                            "(Ljava/lang/String;)Lcom/occ/annotation/CoreInject;",
+                            "()Lcom/occ/annotation/CoreInject;",
                             false
                         )
                         if (inCinit) {

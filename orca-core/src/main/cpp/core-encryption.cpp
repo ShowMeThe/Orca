@@ -25,13 +25,11 @@ jstring encryption::decrypt(const char *key, const char *data) {
             return (jstring) mKeyMap[storeKey];
         }
     }
-    string header = string(HEADER);
-    string class_path = "com/occ/" + header + "/AESEncryption";
+
+    string class_path = AY_OBFUSCATE("com/occ/app/aes/AESEncryption").operator char *();
     string mode = MODE;
-    if (mode == "AES") {
-        class_path = "com/occ/" + header + "/aes/AESEncryption";
-    } else if (mode == "DES") {
-        class_path = "com/occ/" + header + "/des/DESEncryption";
+    if (mode == AY_OBFUSCATE("DES").operator char *()) {
+        class_path = AY_OBFUSCATE("com/occ/app/des/DESEncryption").operator char *();
     }
     jclass encrypt_clz = jniEnv->FindClass(class_path.data());
     if (encrypt_clz != nullptr) {

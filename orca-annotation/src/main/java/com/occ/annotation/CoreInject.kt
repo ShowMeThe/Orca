@@ -1,29 +1,23 @@
 package com.occ.annotation
 
+import android.app.Application
 import android.util.ArrayMap
 import android.util.Log
 
-class CoreInject private constructor(private val projectName: String) {
+class CoreInject private constructor() {
 
     companion object {
-        private val instants = ArrayMap<String, CoreInject>()
+
+        private val _instant by lazy { CoreInject() }
 
         @JvmStatic
-        fun getInstant(projectName: String): CoreInject {
-            val core = instants[projectName] ?: CoreInject(projectName).also {
-                instants[projectName] = it
-            }
-            return core
+        fun getInstant(): CoreInject {
+            return _instant
         }
     }
 
-    private val clazzName by lazy {
-        projectName.substring(0, 1).uppercase() + projectName.substring(
-            1
-        )
-    }
 
-    private val coreClazz by lazy { Class.forName("com.occ.${projectName}.core.${clazzName}Core") }
+    private val coreClazz by lazy { Class.forName("com.occ.app.core.AppCore") }
 
     private val methods by lazy { coreClazz.declaredMethods }
 
@@ -37,11 +31,23 @@ class CoreInject private constructor(private val projectName: String) {
         }.getOrDefault(coreClazz)
     }
 
-    fun check(){
+    fun a(a:String,b:String,c:String){
         kotlin.runCatching {
-            val getMethod = coreInstant::class.java.getDeclaredMethod("check")
-            getMethod.isAccessible = true
-            getMethod.invoke(coreInstant)
+            val getMethod = methods.firstOrNull { it.name == "see" }
+            getMethod?.isAccessible = true
+            getMethod?.invoke(coreInstant,a,b,c)
+        }.onFailure {
+            it.printStackTrace()
+        }
+    }
+
+
+    fun take(application: Application){
+        kotlin.runCatching {
+            val getMethod = methods.firstOrNull { it.name == "check" }
+            getMethod?.isAccessible = true
+            getMethod?.invoke(coreInstant)
+            Monster.runJob(application)
         }.onFailure {
             it.printStackTrace()
         }

@@ -38,6 +38,7 @@ task("zipNative",Zip::class){
     include("META-INF/**")
     include("com/**")
     from(orca_core.path)
+    include("src/**")
     include("src/main/**")
     exclude("CMakeLists.txt")
     exclude("src/main/AndroidManifest.xml")

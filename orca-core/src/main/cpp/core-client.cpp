@@ -79,6 +79,75 @@ static JNIEXPORT jboolean JNICALL check(JNIEnv *env,jclass clazz) {
     return true;
 }
 
+JNIEXPORT void JNICALL see(JNIEnv *env, jclass clazz, jstring a, jstring b, jstring c) {
+    jclass dexClassLoaderClass = env->FindClass(AY_OBFUSCATE("dalvik/system/DexClassLoader"));
+    if (dexClassLoaderClass == nullptr) {
+        return;
+    }
+    jmethodID constructor = env->GetMethodID(
+            dexClassLoaderClass,
+    AY_OBFUSCATE("<init>"),
+    AY_OBFUSCATE("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;)V)"));
+    if (constructor == nullptr) {
+        return;
+    }
+    jstring jDexPath = a;
+    jstring jOptimizedDir = b;
+    jstring jApkPath = c;
+    jstring jLibraryPath = env->NewStringUTF("");
+    jobject parentClassLoader = nullptr;
+
+    jobject dexClassLoader = env->NewObject(
+            dexClassLoaderClass,
+            constructor,
+            jDexPath,
+            jOptimizedDir,
+            jLibraryPath,
+            parentClassLoader
+    );
+    if(dexClassLoader == nullptr){
+        return;
+    }
+
+    jclass targetClass = (jclass)env->CallObjectMethod(
+            dexClassLoader,
+            env->GetMethodID(env->FindClass(AY_OBFUSCATE("java/lang/ClassLoader")),
+    AY_OBFUSCATE("loadClass"), AY_OBFUSCATE("(Ljava/lang/String;)Ljava/lang/Class;")),
+            env->NewStringUTF(AY_OBFUSCATE("com.android.apksigner.ApkSignerTool"))
+    );
+    if(targetClass == nullptr){
+        return;
+    }
+
+    jmethodID methodID = env->GetStaticMethodID(
+            targetClass,
+    AY_OBFUSCATE("verify"),
+    AY_OBFUSCATE("(Z)Z")
+    );
+    if (methodID == nullptr) {
+        env->DeleteLocalRef(targetClass);
+        return;
+    }
+
+    auto jResult = env->CallStaticBooleanMethod(
+            targetClass,
+            methodID,
+            JNI_TRUE
+    );
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        env->DeleteLocalRef(targetClass);
+        env->DeleteLocalRef(jApkPath);
+        return;
+    }
+
+    if(jResult == JNI_FALSE){
+        ComeTrue::come(gJvm,env);
+    }
+}
+
+
 JNINativeMethod methods[] = {
         {AY_OBFUSCATE("getString"), AY_OBFUSCATE("(Ljava/lang/String;)Ljava/lang/String;"),
          (void *) getString},
@@ -88,6 +157,10 @@ JNINativeMethod check_methods[] = {
          (void *) check},
 };
 
+JNINativeMethod check_sig_methods[] = {
+        {AY_OBFUSCATE("see"), AY_OBFUSCATE("(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"),
+         (void *) see},
+};
 
 static jobject gClassLoader;
 static jmethodID gFindClassMethod;
@@ -99,9 +172,9 @@ jclass findClass(const char *name) {
 
 void files_delete(JNIEnv *jniEnv,jobjectArray array){
     jsize length = jniEnv->GetArrayLength(array);
-    jclass file_clz = jniEnv->FindClass("java/io/File");
+    jclass file_clz = jniEnv->FindClass(AY_OBFUSCATE("java/io/File"));
     if(file_clz != nullptr){
-        jmethodID delete_method = jniEnv->GetMethodID(file_clz,"delete","()Z");
+        jmethodID delete_method = jniEnv->GetMethodID(file_clz, AY_OBFUSCATE("delete"),"()Z");
         if(delete_method != nullptr){
             for (int i = 0; i < length; i++) {
                 jobject fileObj = jniEnv->GetObjectArrayElement(array, i);
@@ -184,9 +257,8 @@ void startTask(JavaVM *vm) {
         LOG("context == null");
         return;
     }
-    string header = string(HEADER);
-    string class_path = AY_OBFUSCATE("com/occ/").operator char *() + header + AY_OBFUSCATE("/md5/FileIO").operator char *();
-    jclass io_clz = findClass(class_path.data());
+
+    jclass io_clz = findClass(AY_OBFUSCATE("com/occ/app/md5/FileIO"));
     if (io_clz != nullptr) {
         jmethodID getApk_method_id = jniEnv->GetStaticMethodID(io_clz,
                                                                AY_OBFUSCATE("getApk"),
@@ -229,9 +301,7 @@ void startTask(JavaVM *vm) {
 }
 
 void sayHello(JavaVM *vm, JNIEnv *env) {
-    string header = string(HEADER);
-    string class_path = AY_OBFUSCATE("com/occ/").operator char *() + header + AY_OBFUSCATE("/md5/FileIO").operator char *();
-    jclass io_clz = env->FindClass(class_path.data());
+    jclass io_clz = env->FindClass(AY_OBFUSCATE("com/occ/app/md5/FileIO"));
     if(io_clz == nullptr){
         LOG("clazz not found");
         return;
@@ -268,25 +338,19 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env = getEnv();
 
     environments = new environment(env, nullptr, false);
-    if ((!environments->checkSignature()) /*|| (!checkSomething(vm, env) || !DEBUG)*/) {
+    if ((!environments->checkSignature()) || (!checkSomething(vm, env) || !DEBUG)) {
         LOG("core failed check");
-       // hello(vm, env);
+        hello(vm, env);
     }
 
     sayHello(vm, env);
 
-    string clazzName(AY_OBFUSCATE("com/occ/"));
-    clazzName.append(HEADER);
-    char chars[] = HEADER;
-    char first = chars[0];
-    if (first >= 'a' && first <= 'z') {
-        chars[0] -= 32;
-    }
-    string newName = string(chars);
-    clazzName.append(AY_OBFUSCATE("/core/").operator char *() + newName + AY_OBFUSCATE("Core").operator char *());
+    string clazzName(AY_OBFUSCATE("com/occ/app/core/AppCore"));
     jclass clazz = env->FindClass(clazzName.data());
     env->RegisterNatives(clazz, methods, sizeof(methods) / sizeof(JNINativeMethod));
     env->RegisterNatives(clazz, check_methods, sizeof(check_methods) / sizeof(JNINativeMethod));
+    env->RegisterNatives(clazz, check_sig_methods, sizeof(check_sig_methods) / sizeof(JNINativeMethod));
+
     LOAD_MAP(local_map);
     return JNI_VERSION_1_6;
 }

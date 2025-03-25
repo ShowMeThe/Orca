@@ -17,9 +17,6 @@ open class GenerateRewriteJavaTask : DefaultTask() {
     @InputDirectory
     lateinit var md5File: File
 
-    @Input
-    lateinit var soHeaderName: String
-
     @TaskAction
     fun generate() {
         var sb = StringBuilder()
@@ -28,7 +25,7 @@ open class GenerateRewriteJavaTask : DefaultTask() {
         encryptionFile.reader(utf).use {
             it.readLines().forEachIndexed { index, s ->
                 if (index == 0) {
-                    sb.append(s.replace("encrypt",soHeaderName))
+                    sb.append(s.replace("encrypt","app"))
                 } else {
                     sb.append(s)
                 }
@@ -45,7 +42,7 @@ open class GenerateRewriteJavaTask : DefaultTask() {
         encryptionMd5File.reader(utf).use {
             it.readLines().forEachIndexed { index, s ->
                 if (index == 0) {
-                    sb.append(s.replace("encrypt",soHeaderName))
+                    sb.append(s.replace("encrypt","app"))
                 } else {
                     sb.append(s)
                 }

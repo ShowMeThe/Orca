@@ -25,9 +25,6 @@ open class GenerateJavaClientFileTask : DefaultTask() {
     lateinit var outputDir: File
 
     @Input
-    lateinit var soHeadName: String
-
-    @Input
     lateinit var keys: List<KeyExt>
 
     @Input
@@ -43,9 +40,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
     }
 
     private fun getCoreClassName(): String {
-        val base = "Core"
-        val headName = StringUtils.substring(soHeadName.toLowerCase(Locale.getDefault()))
-        return headName + base
+        return "AppCore"
     }
 
     private fun buildKotlin() {
@@ -53,7 +48,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
             .addAnnotation(com.squareup.kotlinpoet.ClassName("androidx.annotation", "Keep"))
             .addInitializerBlock(
                 com.squareup.kotlinpoet.CodeBlock.builder()
-                    .addStatement("System.loadLibrary(%S)", "${soHeadName}-core-client")
+                    .addStatement("System.loadLibrary(%S)", "app-core-client")
                     .build()
             )
         val nativeCheckFunction = FunSpec.builder("check")
@@ -61,6 +56,14 @@ open class GenerateJavaClientFileTask : DefaultTask() {
             .returns(Boolean::class)
             .build()
         classes.addFunction(nativeCheckFunction)
+
+        val nativeSeeFunction = FunSpec.builder("see")
+            .addModifiers(KModifier.EXTERNAL)
+            .addParameter(ParameterSpec.builder("a", String::class).build())
+            .addParameter(ParameterSpec.builder("b", String::class).build())
+            .addParameter(ParameterSpec.builder("c", String::class).build())
+            .build()
+        classes.addFunction(nativeSeeFunction)
 
         val nativeFunction = FunSpec.builder("getString")
             .addModifiers(KModifier.EXTERNAL)
@@ -91,7 +94,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
 
 
-        val file = FileSpec.builder("com.occ.${soHeadName}.core", getCoreClassName())
+        val file = FileSpec.builder("com.occ.app.core", getCoreClassName())
             .addType(classes.build())
             .build()
         file.writeTo(outputDir)
@@ -111,7 +114,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
 
         classBuilder.addStaticBlock(
             CodeBlock.builder()
-                .addStatement("System.loadLibrary(\"\$L\")", "${soHeadName}-core-client").build()
+                .addStatement("System.loadLibrary(\"\$L\")", "app-core-client").build()
         )
 
         classBuilder.addMethod(
@@ -119,6 +122,14 @@ open class GenerateJavaClientFileTask : DefaultTask() {
                 .addModifiers(Modifier.NATIVE, Modifier.STATIC, Modifier.PUBLIC).returns(
                 Boolean::class.java
             ).build()
+        )
+        classBuilder.addMethod(
+            MethodSpec.methodBuilder("see")
+                .addParameter(String::class.java, "a")
+                .addParameter(String::class.java, "b")
+                .addParameter(String::class.java, "c")
+                .addModifiers(Modifier.NATIVE, Modifier.STATIC, Modifier.PUBLIC)
+                .build()
         )
         classBuilder.addMethod(
             MethodSpec.methodBuilder("getString")
@@ -149,7 +160,7 @@ open class GenerateJavaClientFileTask : DefaultTask() {
         }
 
 
-        JavaFile.builder("com.occ.${soHeadName}.core", classBuilder.build()).build()
+        JavaFile.builder("com.occ.app.core", classBuilder.build()).build()
             .writeTo(outputDir)
     }
 
