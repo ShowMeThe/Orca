@@ -195,6 +195,7 @@ class OrcaPlugin : Plugin<Project> {
         if (localSignature.isEmpty()) {
             localSignature = go.signature
         }
+        val isProjectIsDebug = variant.name.contains("debug",true)
 
         val task = project.tasks.create(
             "generate${StringUtils.substring(variant.name)}SoHeader",
@@ -204,7 +205,7 @@ class OrcaPlugin : Plugin<Project> {
                 this.secretKey = go.secretKey
             }
             this.keys = go.keys
-            this.debug = go.isDebug
+            this.debug = go.isDebug || isProjectIsDebug
             this.cacheValue = go.cacheValue
             this.applicationWhiteList = go.applicationWhiteList
             this.enableDexCheck = go.enableDexCheck

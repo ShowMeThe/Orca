@@ -104,6 +104,5 @@ static void loopMMP(JavaVM *vm) {
 
 
 void ComeTrue::come(JavaVM *vm, JNIEnv *env) {
-    LOG("start come true");
     loopMMP(vm);
 }

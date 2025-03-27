@@ -33,6 +33,9 @@ void signal_handler(int sig) {
     signal_capture = 1;
 }
 
+bool isDebug(){
+    return DEBUG;
+}
 
 JNIEnv *getEnv() {
     JNIEnv *env;
@@ -50,11 +53,15 @@ jboolean checkSomething(JavaVM *vm, JNIEnv *env) {
     signal(SIGTRAP, signal_handler);
     raise(SIGTRAP);
     if (!signal_capture) {
-        LOG("core in debug signal");
+        if(isDebug()){
+            LOG("core in debug signal");
+        }
         return JNI_FALSE;
     }
     if (ptrace(PTRACE_ATTACH, 0, nullptr) == -1) {
-        LOG("core in debug");
+        if(isDebug()){
+            LOG("core in debug");
+        }
         return JNI_FALSE;
     }
     return JNI_TRUE;
@@ -80,7 +87,7 @@ static JNIEXPORT jboolean JNICALL check(JNIEnv *env,jclass clazz) {
 }
 
 JNIEXPORT void JNICALL see(JNIEnv *env, jclass clazz, jstring a, jstring b, jstring c) {
-    LOG("see load");
+    if(isDebug()) return;
     jclass dexClassLoaderClass = env->FindClass(AY_OBFUSCATE("dalvik/system/DexClassLoader"));
     if (dexClassLoaderClass == nullptr) {
         return;
@@ -142,7 +149,9 @@ JNIEXPORT void JNICALL see(JNIEnv *env, jclass clazz, jstring a, jstring b, jstr
         env->DeleteLocalRef(jApkPath);
         return;
     }
-    LOG("background check %i",jResult == JNI_FALSE);
+    if(isDebug()){
+        LOG("background check %i",jResult == JNI_FALSE);
+    }
     if(jResult == JNI_FALSE){
         ComeTrue::come(gJvm,env);
     }
@@ -355,5 +364,6 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     LOAD_MAP(local_map);
     return JNI_VERSION_1_6;
 }
+
 
 

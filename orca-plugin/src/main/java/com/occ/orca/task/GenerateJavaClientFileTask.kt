@@ -32,6 +32,8 @@ open class GenerateJavaClientFileTask : DefaultTask() {
 
     @TaskAction
     fun generate() {
+        outputDir.walkBottomUp().toMutableList().filter {
+            it.nameWithoutExtension == getCoreClassName() }.onEach { it.delete() }
         if (buildWithKotlin) {
             buildKotlin()
         } else {

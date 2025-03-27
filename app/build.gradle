@@ -23,7 +23,7 @@ android {
         isDebug = true
         signature = "-2103629870"
         encryptMode = "des"
-        isBuildKotlin = false
+        isBuildKotlin = true
         cacheValue = true
         instrumentalList = []
 
